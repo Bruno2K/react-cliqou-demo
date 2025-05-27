@@ -16,9 +16,9 @@ import {
 } from '@/components/ui/sidebar';
 import { AnalyticsTopbar } from '@/components/dashboard/analytics/topbar';
 import { KpiCard } from '@/components/dashboard/analytics/kpi-card';
-import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChart, Activity, MapPin, TargetIcon, ExternalLink } from '@/components/icons';
+import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChart as PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink } from '@/components/icons'; // Renamed PieChart import to avoid conflict
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell } from 'recharts'; // Using recharts directly for more control
+import { LineChart, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line } from 'recharts'; // Using recharts directly for more control
 
 // Mock Data
 const kpiData = [
@@ -79,7 +79,7 @@ export default function AnalyticsDashboardPage() {
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton tooltip="Dispositivos">
-                <PieChart />
+                <PieChartIcon />
                 Dispositivos
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -185,7 +185,7 @@ export default function AnalyticsDashboardPage() {
               <Card className="shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
-                    <PieChart size={20} />
+                    <PieChartIcon size={20} />
                     Tipos de Dispositivo
                   </CardTitle>
                 </CardHeader>
@@ -242,3 +242,4 @@ export default function AnalyticsDashboardPage() {
 
 // Helper for device size in PieChart (if needed outside useEffect) - typically handled by ResponsiveContainer
 const activeDeviceView = typeof window !== 'undefined' && window.innerWidth < 768 ? 'mobile' : 'desktop';
+

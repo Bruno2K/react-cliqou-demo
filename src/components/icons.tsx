@@ -72,10 +72,10 @@ export const {
   Info,
   LayoutDashboard,
   Activity,
-  PieChart, // Explicitly exporting PieChart
+  PieChart: PieChartIcon, // Renamed PieChart to avoid conflict with recharts component
   BarChart3, // For bar chart icon
   MapPin,
-  TargetIcon, // Corrected from Target
+  Target: TargetIcon, // Use TargetIcon if available, or alias Target
   ExternalLink,
   FileText,
   Settings2, // if different from Settings
@@ -85,3 +85,4 @@ export const {
 
 // Export Image as ImageIcon separately
 export const { Image: ImageIcon } = LucideIcons;
+
