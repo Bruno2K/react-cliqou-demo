@@ -5,13 +5,13 @@ import React, { useState, useEffect, useMemo } from 'react';
 import type { LinkItem, ThemeSettings } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'; // Added DialogTitle
 import { ThemeEditor } from '@/components/dashboard/theme-editor';
 import { ProfilePreview } from '@/components/dashboard/profile-preview';
 import { EditableLinkItem } from '@/components/dashboard/editable-link-item';
 import { LinkForm } from '@/components/dashboard/link-form';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { PlusCircle, Link as LinkIconLucide, Eye } from '@/components/icons';
+import { PlusCircle, Link as LinkIconLucide, Eye as EyeIcon } from '@/components/icons'; // Renamed Eye to EyeIcon to avoid conflict
 import { useToast } from "@/hooks/use-toast";
 
 import {
@@ -147,7 +147,7 @@ export default function DashboardPage() {
           <h1 className="text-lg sm:text-xl font-bold text-primary">LinkedUp</h1>
           <div className="flex items-center gap-1 sm:gap-2">
             <Button onClick={() => setIsPreviewModalOpen(true)} className="lg:hidden" variant="outline" size="sm">
-              <Eye size={16} className="mr-1 sm:mr-2" /> Preview
+              <EyeIcon size={16} className="mr-1 sm:mr-2" /> Preview
             </Button>
             <ThemeToggle />
           </div>
@@ -161,7 +161,7 @@ export default function DashboardPage() {
             <Card className="shadow-lg">
               <CardHeader className="flex flex-col items-start gap-2 p-3 sm:p-4 sm:flex-row sm:items-center sm:justify-between">
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                  <LinkIconLucide size={18} className="sm:size-20" />
+                  <LinkIconLucide size={18} className="sm:size-20" /> 
                   Manage Links
                 </CardTitle>
                 <Button onClick={handleOpenAddLink} size="sm" className="text-xs px-2 py-1 h-auto sm:text-sm sm:px-3 sm:py-1.5 sm:h-auto self-start sm:self-center">
@@ -228,6 +228,7 @@ export default function DashboardPage() {
       {/* Preview Modal (Mobile) */}
       <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
         <DialogContent className="p-0 w-auto h-auto bg-transparent border-none shadow-none data-[state=open]:zoom-in-90 sm:rounded-lg">
+          <DialogTitle className="sr-only">Profile Page Preview</DialogTitle>
           <ProfilePreview links={links} theme={theme} activeDeviceView="mobile" showDeviceSelector={false} />
         </DialogContent>
       </Dialog>
