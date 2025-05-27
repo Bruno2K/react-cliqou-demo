@@ -224,7 +224,7 @@ export default function AnalyticsDashboardPage() {
         <SidebarFooter className="p-2">
           <SidebarMenu>
             <SidebarMenuItem>
-              <Link href="/" asChild>
+              <Link href="/">
                 <SidebarMenuButton tooltip="Back to Editor">
                   <Edit3 />
                   Back to Editor
