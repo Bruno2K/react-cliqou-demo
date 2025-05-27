@@ -17,9 +17,9 @@ import {
 } from '@/components/ui/sidebar';
 import { AnalyticsTopbar } from '@/components/dashboard/analytics/topbar';
 import { KpiCard } from '@/components/dashboard/analytics/kpi-card';
-import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3, Filter, MoreHorizontal, ChevronDown, Radar } from '@/components/icons';
+import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3, Filter, MoreHorizontal, ChevronDown, Radar as RadarIcon, Smartphone } from '@/components/icons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, BarChart, PieChart as RechartsPieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, Bar } from 'recharts';
+import { LineChart, BarChart, PieChart as RechartsPieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar as RechartsRadar } from 'recharts';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -87,13 +87,27 @@ const linkPerformanceData: LinkPerformanceItem[] = [
   { id: 'link5', name: 'Linktree Antigo (Desativado)', url: 'https://linktr.ee/oldprofile', totalClicks: 50, clicksByDevice: 'M:30 D:15 T:5', clicksByRegion: 'N/A', status: 'inactive' },
 ];
 
+const deviceUsageData = [
+  { name: 'Mobile', value: 65, fill: 'hsl(var(--chart-1))' },
+  { name: 'Desktop', value: 25, fill: 'hsl(var(--chart-2))' },
+  { name: 'Tablet', value: 10, fill: 'hsl(var(--chart-3))' },
+];
+
+const browserUsageData = [
+  { subject: 'Chrome', usage: 60, fullMark: 100 },
+  { subject: 'Safari', usage: 20, fullMark: 100 },
+  { subject: 'Edge', usage: 10, fullMark: 100 },
+  { subject: 'Firefox', usage: 5, fullMark: 100 },
+  { subject: 'Outros', usage: 5, fullMark: 100 },
+];
+
 
 // Helper for device size in PieChart
-const getActiveDeviceViewHelper = () => { // Renamed to avoid conflict
+const getActiveDeviceViewHelper = () => { 
     if (typeof window !== 'undefined') {
         return window.innerWidth < 768 ? 'mobile' : 'desktop';
     }
-    return 'desktop'; // Default for SSR or non-browser environments
+    return 'desktop'; 
 };
 
 type ActiveView = 'overview' | 'engagement' | 'link-performance' | 'devices' | 'geolocation' | 'conversions' | 'technical-performance';
@@ -104,9 +118,8 @@ export default function AnalyticsDashboardPage() {
   const [activeView, setActiveView] = useState<ActiveView>('overview');
   const [activePieChartSizeView, setActivePieChartSizeView] = useState<'mobile' | 'desktop'>('desktop');
 
-  // Filters for Link Performance
   const [statusFilter, setStatusFilter] = useState<Record<LinkPerformanceItem['status'], boolean>>({ active: true, inactive: true });
-  const [performanceFilter, setPerformanceFilter] = useState<string>('all'); // 'all', 'top', 'bottom'
+  const [performanceFilter, setPerformanceFilter] = useState<string>('all'); 
 
   const handleStatusFilterChange = (status: LinkPerformanceItem['status']) => {
     setStatusFilter(prev => ({ ...prev, [status]: !prev[status] }));
@@ -114,7 +127,6 @@ export default function AnalyticsDashboardPage() {
 
   const filteredLinkPerformanceData = linkPerformanceData.filter(link => {
     const isStatusMatch = (statusFilter.active && link.status === 'active') || (statusFilter.inactive && link.status === 'inactive');
-    // Placeholder for performance filter logic
     return isStatusMatch;
   });
 
@@ -123,7 +135,7 @@ export default function AnalyticsDashboardPage() {
     const handleResize = () => {
       setActivePieChartSizeView(getActiveDeviceViewHelper());
     };
-    handleResize(); // Initial call
+    handleResize(); 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -257,7 +269,6 @@ export default function AnalyticsDashboardPage() {
             <section id="engagement" className="mb-8">
               <h2 className="text-2xl font-semibold mb-4 text-foreground">Engajamento dos Usuários</h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-                {/* Cliques por Dia (Últimos 30 dias) - Gráfico de Linha */}
                 <Card className="shadow-lg">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
@@ -287,7 +298,6 @@ export default function AnalyticsDashboardPage() {
                   </CardContent>
                 </Card>
 
-                {/* Origem dos Acessos - Gráfico de Barras */}
                 <Card className="shadow-lg">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
@@ -321,7 +331,6 @@ export default function AnalyticsDashboardPage() {
                   </CardContent>
                 </Card>
 
-                {/* Taxa de Retorno (Novos vs Recorrentes) - Gráfico de Pizza */}
                 <Card className="shadow-lg">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
@@ -360,7 +369,6 @@ export default function AnalyticsDashboardPage() {
                   </CardContent>
                 </Card>
 
-                {/* Mapa de Calor por Horário - Placeholder */}
                 <Card className="shadow-lg">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-lg">
@@ -421,12 +429,11 @@ export default function AnalyticsDashboardPage() {
                       <DropdownMenuItem onSelect={() => setPerformanceFilter('bottom')}>Menos Clicados</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  {/* Date filter is global from Topbar */}
                 </div>
               </div>
 
               <Card className="shadow-lg">
-                <CardContent className="p-0"> {/* Remove padding for full-width table */}
+                <CardContent className="p-0"> 
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
@@ -478,12 +485,88 @@ export default function AnalyticsDashboardPage() {
             </section>
           )}
 
+          {activeView === 'devices' && (
+            <section id="devices" className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">Dispositivos e Plataformas</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+                {/* Tipos de Dispositivo - Gráfico de Pizza */}
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Smartphone size={20} />
+                      Tipos de Dispositivo (%)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[300px] sm:h-[350px] flex items-center justify-center">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsPieChart>
+                        <Pie
+                          data={deviceUsageData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          outerRadius={Math.min(typeof window !== 'undefined' ? window.innerWidth : 300, typeof window !== 'undefined' ? window.innerHeight : 300) / (activePieChartSizeView === 'mobile' ? 7 : 9)}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {deviceUsageData.map((entry, index) => (
+                            <Cell key={`cell-device-${index}`} fill={entry.fill} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--background))',
+                            borderColor: 'hsl(var(--border))',
+                            borderRadius: 'var(--radius)',
+                          }}
+                          formatter={(value, name) => [`${value}%`, name]}
+                        />
+                        <Legend wrapperStyle={{fontSize: '12px', paddingTop: '20px'}} layout="horizontal" verticalAlign="bottom" align="center" />
+                      </RechartsPieChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+
+                {/* Navegadores Utilizados - Gráfico de Radar */}
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <RadarIcon size={20} />
+                      Navegadores Utilizados (%)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[300px] sm:h-[350px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart cx="50%" cy="50%" outerRadius="80%" data={browserUsageData}>
+                        <PolarGrid stroke="hsl(var(--border))" />
+                        <PolarAngleAxis dataKey="subject" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12} />
+                        <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={10} />
+                        <RechartsRadar name="Uso" dataKey="usage" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.6} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--background))',
+                            borderColor: 'hsl(var(--border))',
+                            borderRadius: 'var(--radius)',
+                          }}
+                          labelStyle={{ color: 'hsl(var(--foreground))' }}
+                          formatter={(value, name, props) => [`${value}%`, props.payload.subject]}
+                        />
+                        <Legend wrapperStyle={{fontSize: '12px'}}/>
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+          )}
+
           {/* Placeholder for other views */}
-          {activeView !== 'overview' && activeView !== 'engagement' && activeView !== 'link-performance' && (
+          {activeView !== 'overview' && activeView !== 'engagement' && activeView !== 'link-performance' && activeView !== 'devices' && (
             <section className="mb-8">
                <Card>
                   <CardHeader>
-                    <CardTitle className="capitalize">Conteúdo para "{activeView.replace('-', ' ')}" em breve...</CardTitle>
+                    <CardTitle className="capitalize">Conteúdo para "{activeView.replace(/-/g, ' ')}" em breve...</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground">O conteúdo desta seção será adicionado quando implementado.</p>
@@ -497,3 +580,4 @@ export default function AnalyticsDashboardPage() {
     </SidebarProvider>
   );
 }
+

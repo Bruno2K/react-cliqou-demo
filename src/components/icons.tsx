@@ -23,19 +23,16 @@ const DynamicIcon = ({ name, ...props }: { name: IconName } & LucideProps) => {
 export const IconRenderer: React.FC<{ name?: string; className?: string; size?: number }> = ({ name, className, size = 20 }) => {
   if (!name) return <LucideIcons.Link className={className} size={size} />;
   
-  // Capitalize first letter and ensure camelCase for icon names if needed (e.g., "linkedin" -> "Linkedin")
-  // Also handle cases like 'GitHub' -> 'Github' if Lucide expects that
   let formattedName = name.charAt(0).toUpperCase() + name.slice(1);
-  if (formattedName === "Github") formattedName = "GitHub"; // Lucide specific casing
-  if (formattedName === "Linkedin") formattedName = "Linkedin"; // Lucide specific casing for Linkedin, etc.
+  if (formattedName === "Github") formattedName = "GitHub"; 
+  if (formattedName === "Linkedin") formattedName = "Linkedin"; 
 
 
   if (formattedName in LucideIcons) {
     return <DynamicIcon name={formattedName as IconName} className={className} size={size} />;
   }
   
-  // Fallback for icons not directly in Lucide or simple custom SVGs
-  return <LucideIcons.Link className={className} size={size} />; // Default to a generic link icon
+  return <LucideIcons.Link className={className} size={size} />; 
 };
 
 // Export commonly used icons for convenience if needed
@@ -75,7 +72,7 @@ export const {
   Info,
   LayoutDashboard,
   Activity,
-  PieChartIcon, 
+  PieChartIcon, // Icon for sidebar or titles
   BarChart3, 
   MapPin,
   TargetIcon, 
@@ -91,5 +88,4 @@ export const {
 
 // Export Image as ImageIcon separately
 export const { Image: ImageIcon } = LucideIcons;
-
     
