@@ -56,7 +56,31 @@ export const {
   ArrowDown, 
   ArrowUp, 
   ToggleLeft, 
-  ToggleRight 
+  ToggleRight,
+  ChevronDown,
+  Bell,
+  CalendarDays,
+  LogOut,
+  AreaChart,
+  Users,
+  Percent,
+  Clock,
+  TrendingUp,
+  TrendingDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  Info,
+  LayoutDashboard,
+  Activity,
+  PieChart, // Explicitly exporting PieChart
+  BarChart3, // For bar chart icon
+  MapPin,
+  TargetIcon, // Corrected from Target
+  ExternalLink,
+  FileText,
+  Settings2, // if different from Settings
+  Mail,
+  AlertCircle, // for bounce rate or errors
 } = LucideIcons;
 
 // Export Image as ImageIcon separately
