@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   SidebarProvider,
   Sidebar,
@@ -16,7 +17,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AnalyticsTopbar } from '@/components/dashboard/analytics/topbar';
 import { KpiCard } from '@/components/dashboard/analytics/kpi-card';
-import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays } from '@/components/icons';
+import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3 } from '@/components/icons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, BarChart, PieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, Bar } from 'recharts';
 
@@ -133,6 +134,14 @@ export default function AnalyticsDashboardPage() {
         </SidebarContent>
         <SidebarFooter className="p-2">
           <SidebarMenu>
+            <SidebarMenuItem>
+              <Link href="/" passHref asChild>
+                <SidebarMenuButton tooltip="Back to Editor">
+                  <Edit3 />
+                  Back to Editor
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton tooltip="Configurações">
                 <Settings />
