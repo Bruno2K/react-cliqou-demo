@@ -72,7 +72,7 @@ export const {
   Info,
   LayoutDashboard,
   Activity,
-  PieChartIcon, // Icon for sidebar or titles
+  PieChartIcon,
   BarChart3, 
   MapPin,
   TargetIcon, 
@@ -83,9 +83,10 @@ export const {
   AlertCircle,
   Filter,
   MoreHorizontal,
-  Radar, 
+  Radar,
+  Map: MapIcon, // For geolocation map icon
 } = LucideIcons;
 
 // Export Image as ImageIcon separately
 export const { Image: ImageIcon } = LucideIcons;
-    
+

@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AnalyticsTopbar } from '@/components/dashboard/analytics/topbar';
 import { KpiCard } from '@/components/dashboard/analytics/kpi-card';
-import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3, Filter, MoreHorizontal, ChevronDown, Radar as RadarIcon, Smartphone } from '@/components/icons';
+import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3, Filter, MoreHorizontal, ChevronDown, Radar as RadarIcon, Smartphone, Map as MapIcon } from '@/components/icons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, BarChart, PieChart as RechartsPieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar as RechartsRadar } from 'recharts';
 import { Button } from '@/components/ui/button';
@@ -101,13 +101,21 @@ const browserUsageData = [
   { subject: 'Outros', usage: 5, fullMark: 100 },
 ];
 
+const regionAccessData = [
+    { region: 'São Paulo, BR', accesses: 15200, change: '+5%' },
+    { region: 'Rio de Janeiro, BR', accesses: 10800, change: '+2%' },
+    { region: 'Minas Gerais, BR', accesses: 8500, change: '-1%' },
+    { region: 'Lisboa, PT', accesses: 7200, change: '+8%' },
+    { region: 'California, US', accesses: 6100, change: '+3%' },
+];
+
 
 // Helper for device size in PieChart
-const getActiveDeviceViewHelper = () => { 
+const getActiveDeviceViewHelper = () => {
     if (typeof window !== 'undefined') {
         return window.innerWidth < 768 ? 'mobile' : 'desktop';
     }
-    return 'desktop'; 
+    return 'desktop';
 };
 
 type ActiveView = 'overview' | 'engagement' | 'link-performance' | 'devices' | 'geolocation' | 'conversions' | 'technical-performance';
@@ -119,7 +127,7 @@ export default function AnalyticsDashboardPage() {
   const [activePieChartSizeView, setActivePieChartSizeView] = useState<'mobile' | 'desktop'>('desktop');
 
   const [statusFilter, setStatusFilter] = useState<Record<LinkPerformanceItem['status'], boolean>>({ active: true, inactive: true });
-  const [performanceFilter, setPerformanceFilter] = useState<string>('all'); 
+  const [performanceFilter, setPerformanceFilter] = useState<string>('all');
 
   const handleStatusFilterChange = (status: LinkPerformanceItem['status']) => {
     setStatusFilter(prev => ({ ...prev, [status]: !prev[status] }));
@@ -135,7 +143,7 @@ export default function AnalyticsDashboardPage() {
     const handleResize = () => {
       setActivePieChartSizeView(getActiveDeviceViewHelper());
     };
-    handleResize(); 
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -433,7 +441,7 @@ export default function AnalyticsDashboardPage() {
               </div>
 
               <Card className="shadow-lg">
-                <CardContent className="p-0"> 
+                <CardContent className="p-0">
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
@@ -561,8 +569,65 @@ export default function AnalyticsDashboardPage() {
             </section>
           )}
 
+          {activeView === 'geolocation' && (
+            <section id="geolocation" className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">Geolocalização</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+                <Card className="shadow-lg lg:col-span-2"> {/* Map might take full width or more space */}
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <MapIcon size={20} />
+                      Mapa de Calor de Acessos
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[350px] sm:h-[400px] flex items-center justify-center">
+                    <div className="text-center">
+                      <MapIcon size={48} className="mx-auto text-muted-foreground mb-2" />
+                      <p className="text-muted-foreground">Componente de mapa de calor em breve.</p>
+                      <p className="text-xs text-muted-foreground mt-1">(Ex: Integração com Google Maps API, Leaflet, etc.)</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-lg lg:col-span-2"> {/* Table might also take full width or more space */}
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <TrendingUp size={20} />
+                      Ranking de Regiões por Acesso
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                     <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Região</TableHead>
+                              <TableHead className="text-right">Acessos</TableHead>
+                              <TableHead className="text-right">Variação</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {regionAccessData.map((region) => (
+                              <TableRow key={region.region}>
+                                <TableCell className="font-medium">{region.region}</TableCell>
+                                <TableCell className="text-right">{region.accesses.toLocaleString()}</TableCell>
+                                <TableCell className={cn("text-right", region.change.startsWith('+') ? 'text-green-600' : 'text-red-600')}>
+                                  {region.change}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-4 text-center">Tabela interativa com paginação e ordenação em breve.</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+          )}
+
           {/* Placeholder for other views */}
-          {activeView !== 'overview' && activeView !== 'engagement' && activeView !== 'link-performance' && activeView !== 'devices' && (
+          {activeView !== 'overview' && activeView !== 'engagement' && activeView !== 'link-performance' && activeView !== 'devices' && activeView !== 'geolocation' && (
             <section className="mb-8">
                <Card>
                   <CardHeader>
@@ -580,4 +645,3 @@ export default function AnalyticsDashboardPage() {
     </SidebarProvider>
   );
 }
-
