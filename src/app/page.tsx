@@ -5,13 +5,13 @@ import React, { useState, useEffect, useMemo } from 'react';
 import type { LinkItem, ThemeSettings } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { ThemeEditor } from '@/components/dashboard/theme-editor';
 import { ProfilePreview } from '@/components/dashboard/profile-preview';
 import { EditableLinkItem } from '@/components/dashboard/editable-link-item';
 import { LinkForm } from '@/components/dashboard/link-form';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { PlusCircle, Smartphone, Tablet, Monitor, Settings, Link as LinkIconLucide, Eye, X as CloseIcon } from '@/components/icons';
+import { PlusCircle, Link as LinkIconLucide, Eye } from '@/components/icons';
 import { useToast } from "@/hooks/use-toast";
 
 import {
@@ -143,8 +143,8 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 sm:h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
-          <h1 className="text-xl sm:text-2xl font-bold text-primary">LinkedUp</h1>
+        <div className="container flex h-12 sm:h-14 items-center justify-between px-3 sm:px-6 lg:px-8">
+          <h1 className="text-lg sm:text-xl font-bold text-primary">LinkedUp</h1>
           <div className="flex items-center gap-1 sm:gap-2">
             <Button onClick={() => setIsPreviewModalOpen(true)} className="lg:hidden" variant="outline" size="sm">
               <Eye size={16} className="mr-1 sm:mr-2" /> Preview
@@ -154,21 +154,21 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="container py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
+      <main className="container py-3 sm:py-4 px-3 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
           {/* Left Panel: Editor */}
-          <div className="w-full lg:w-2/5 space-y-4 sm:space-y-6">
+          <div className="w-full lg:w-2/5 space-y-3 sm:space-y-4">
             <Card className="shadow-lg">
-              <CardHeader className="flex flex-col items-start gap-2 p-3 sm:p-4 md:p-6 sm:flex-row sm:items-center sm:justify-between">
-                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                  <LinkIconLucide size={20} className="sm:size-24" />
+              <CardHeader className="flex flex-col items-start gap-2 p-3 sm:p-4 sm:flex-row sm:items-center sm:justify-between">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <LinkIconLucide size={18} className="sm:size-20" />
                   Manage Links
                 </CardTitle>
-                <Button onClick={handleOpenAddLink} size="sm" className="text-xs px-3 py-1.5 h-auto sm:text-sm sm:px-4 sm:py-2 sm:h-10 self-start sm:self-auto">
-                  <PlusCircle size={16} className="mr-1 sm:mr-2" /> Add Link
+                <Button onClick={handleOpenAddLink} size="sm" className="text-xs px-2 py-1 h-auto sm:text-sm sm:px-3 sm:py-1.5 sm:h-auto self-start sm:self-center">
+                  <PlusCircle size={14} className="mr-1 sm:mr-1.5" /> Add Link
                 </Button>
               </CardHeader>
-              <CardContent className="p-2 sm:p-3 md:p-4">
+              <CardContent className="p-2 sm:p-3">
                 {links.length === 0 ? (
                   <p className="text-muted-foreground text-center py-4 text-sm sm:text-base">No links yet. Add your first link!</p>
                 ) : (
@@ -197,21 +197,17 @@ export default function DashboardPage() {
           </div>
 
           {/* Right Panel: Preview (Desktop) */}
-          <div className="hidden lg:block w-full lg:w-3/5 sticky top-[calc(3.5rem+1rem)] sm:top-[calc(4rem+1.5rem)] self-start">
+          <div className="hidden lg:block w-full lg:w-3/5 sticky top-[calc(3rem+0.75rem)] sm:top-[calc(3.5rem+1rem)] self-start">
             <Card className="shadow-lg">
-              <CardHeader className="flex flex-col items-start gap-2 p-3 sm:p-4 md:p-6 sm:flex-row sm:items-center sm:justify-between">
-                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                  <Eye size={20} className="sm:size-24"/>
-                  Live Preview
-                </CardTitle>
-                <div className="flex items-center gap-1.5 sm:gap-2 self-start sm:self-auto">
-                  <Button variant={activeDeviceView === 'mobile' ? 'default' : 'outline'} size="icon" className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10" onClick={() => setActiveDeviceView('mobile')} aria-label="Mobile preview"> <Smartphone size={16} className="sm:size-18 md:size-20"/> </Button>
-                  <Button variant={activeDeviceView === 'tablet' ? 'default' : 'outline'} size="icon" className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10" onClick={() => setActiveDeviceView('tablet')} aria-label="Tablet preview"> <Tablet size={16} className="sm:size-18 md:size-20"/> </Button>
-                  <Button variant={activeDeviceView === 'desktop' ? 'default' : 'outline'} size="icon" className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10" onClick={() => setActiveDeviceView('desktop')} aria-label="Desktop preview"> <Monitor size={16} className="sm:size-18 md:size-20"/> </Button>
-                </div>
-              </CardHeader>
+              {/* The CardHeader was removed from here to avoid duplication with ProfilePreview's own header */}
               <CardContent className={activeDeviceView !== 'desktop' ? 'flex justify-center items-start p-2 sm:p-4 overflow-auto' : 'p-0'}>
-                 <ProfilePreview links={links} theme={theme} activeDeviceView={activeDeviceView} showDeviceSelector={true} />
+                 <ProfilePreview 
+                    links={links} 
+                    theme={theme} 
+                    activeDeviceView={activeDeviceView} 
+                    showDeviceSelector={true} 
+                    onDeviceChange={setActiveDeviceView} 
+                 />
               </CardContent>
             </Card>
           </div>
@@ -232,7 +228,6 @@ export default function DashboardPage() {
       {/* Preview Modal (Mobile) */}
       <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
         <DialogContent className="p-0 w-auto h-auto bg-transparent border-none shadow-none data-[state=open]:zoom-in-90 sm:rounded-lg">
-           {/* The X close button is part of DialogContent by default in shadcn */}
           <ProfilePreview links={links} theme={theme} activeDeviceView="mobile" showDeviceSelector={false} />
         </DialogContent>
       </Dialog>
