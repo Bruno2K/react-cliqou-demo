@@ -139,7 +139,7 @@ const getActiveDeviceViewHelper = () => {
     return 'desktop';
 };
 
-type ActiveView = 'overview' | 'engagement' | 'link-performance' | 'devices' | 'geolocation' | 'conversions' | 'technical-performance';
+type ActiveView = 'overview' | 'engagement' | 'link-performance' | 'devices' | 'geolocation' | 'conversions';
 
 
 export default function AnalyticsDashboardPage() {
@@ -217,12 +217,6 @@ export default function AnalyticsDashboardPage() {
               <SidebarMenuButton isActive={activeView === 'conversions'} onClick={() => setActiveView('conversions')} tooltip="Conversões">
                 <TargetIcon />
                 Conversões
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton isActive={activeView === 'technical-performance'} onClick={() => setActiveView('technical-performance')} tooltip="Performance Técnica">
-                <TrendingUp />
-                Performance Técnica
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
