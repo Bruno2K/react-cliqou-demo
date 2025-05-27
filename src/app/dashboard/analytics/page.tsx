@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SidebarProvider,
   Sidebar,
@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AnalyticsTopbar } from '@/components/dashboard/analytics/topbar';
 import { KpiCard } from '@/components/dashboard/analytics/kpi-card';
-import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChart as PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink } from '@/components/icons'; // Renamed PieChart import to avoid conflict
+import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink } from '@/components/icons'; // Corrected PieChart import
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line } from 'recharts'; // Using recharts directly for more control
 
@@ -42,9 +42,28 @@ const deviceData = [
   { name: 'Tablet', value: 5, color: 'hsl(var(--chart-3))' },
 ];
 
+// Helper for device size in PieChart
+const getActiveDeviceView = () => {
+    if (typeof window !== 'undefined') {
+        return window.innerWidth < 768 ? 'mobile' : 'desktop';
+    }
+    return 'desktop'; // Default for SSR or non-browser environments
+};
+
 
 export default function AnalyticsDashboardPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
+  const [activeDeviceView, setActiveDeviceView] = useState<'mobile' | 'desktop'>('desktop');
+
+  useEffect(() => {
+    const handleResize = () => {
+      setActiveDeviceView(getActiveDeviceView());
+    };
+    handleResize(); // Set initial value
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
 
   return (
     <SidebarProvider defaultOpen>
@@ -197,7 +216,7 @@ export default function AnalyticsDashboardPage() {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        outerRadius={Math.min(window.innerWidth, window.innerHeight) / (activeDeviceView === 'mobile' ? 6 : 8)} // Adjust based on context if needed
+                        outerRadius={Math.min(typeof window !== 'undefined' ? window.innerWidth : 300, typeof window !== 'undefined' ? window.innerHeight : 300) / (activeDeviceView === 'mobile' ? 7 : 9)}
                         fill="#8884d8"
                         dataKey="value"
                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
@@ -239,7 +258,3 @@ export default function AnalyticsDashboardPage() {
     </SidebarProvider>
   );
 }
-
-// Helper for device size in PieChart (if needed outside useEffect) - typically handled by ResponsiveContainer
-const activeDeviceView = typeof window !== 'undefined' && window.innerWidth < 768 ? 'mobile' : 'desktop';
-
