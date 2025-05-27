@@ -1,3 +1,4 @@
+
 export interface LinkItem {
   id: string;
   title: string;
@@ -17,4 +18,12 @@ export interface ThemeSettings {
   profileImageUrl?: string;
   username?: string;
   bio?: string;
+}
+
+export interface ProfilePreviewProps {
+  links: LinkItem[];
+  theme: ThemeSettings;
+  activeDeviceView?: 'mobile' | 'tablet' | 'desktop';
+  showDeviceSelector?: boolean; // If false, hides the Mobile/Tablet/Desktop toggle buttons
+  onDeviceChange?: (device: 'mobile' | 'tablet' | 'desktop') => void; // Callback for when device view changes
 }

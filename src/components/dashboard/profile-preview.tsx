@@ -1,20 +1,23 @@
+
 "use client";
 
 import React from 'react';
-import type { LinkItem, ThemeSettings } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
+import type { LinkItem, ThemeSettings, ProfilePreviewProps } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn, getContrastColor } from '@/lib/utils';
-import { IconRenderer, UserCircle } from '@/components/icons';
+import { IconRenderer, UserCircle, Eye, Smartphone, Tablet, Monitor } from '@/components/icons';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 
-interface ProfilePreviewProps {
-  links: LinkItem[];
-  theme: ThemeSettings;
-  activeDeviceView?: 'mobile' | 'tablet' | 'desktop';
-}
 
-export const ProfilePreview: React.FC<ProfilePreviewProps> = ({ links, theme, activeDeviceView = 'desktop' }) => {
+export const ProfilePreview: React.FC<ProfilePreviewProps> = ({ 
+  links, 
+  theme, 
+  activeDeviceView = 'desktop',
+  showDeviceSelector = true,
+  onDeviceChange 
+}) => {
   const textColor = getContrastColor(theme.primaryColor);
   const pageTextColor = getContrastColor(theme.backgroundColor);
 
@@ -39,9 +42,33 @@ export const ProfilePreview: React.FC<ProfilePreviewProps> = ({ links, theme, ac
   const profileBio = theme.bio || "Your catchy bio goes here! ✨";
 
   return (
-    <Card className={cn("shadow-lg overflow-hidden", deviceWidthClasses[activeDeviceView])}>
+    <Card className={cn(
+        "shadow-lg overflow-hidden", 
+        activeDeviceView === 'desktop' && !showDeviceSelector ? 'w-full h-full min-h-[600px]' : deviceWidthClasses[activeDeviceView]
+      )}
+    >
+       <CardHeader className={cn(
+        "flex flex-col items-start gap-2 p-3 sm:p-4 md:p-6 sm:flex-row sm:items-center sm:justify-between",
+        !showDeviceSelector && "hidden" // Hide header if device selector is off
+      )}>
+        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+          <Eye size={20} className="sm:size-24"/>
+          Live Preview
+        </CardTitle>
+        {showDeviceSelector && onDeviceChange && (
+          <div className="flex items-center gap-1.5 sm:gap-2 self-start sm:self-auto">
+            <Button variant={activeDeviceView === 'mobile' ? 'default' : 'outline'} size="icon" className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10" onClick={() => onDeviceChange('mobile')} aria-label="Mobile preview"> <Smartphone size={16} className="sm:size-18 md:size-20"/> </Button>
+            <Button variant={activeDeviceView === 'tablet' ? 'default' : 'outline'} size="icon" className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10" onClick={() => onDeviceChange('tablet')} aria-label="Tablet preview"> <Tablet size={16} className="sm:size-18 md:size-20"/> </Button>
+            <Button variant={activeDeviceView === 'desktop' ? 'default' : 'outline'} size="icon" className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10" onClick={() => onDeviceChange('desktop')} aria-label="Desktop preview"> <Monitor size={16} className="sm:size-18 md:size-20"/> </Button>
+          </div>
+        )}
+      </CardHeader>
       <CardContent 
-        className="h-full p-0 flex flex-col items-center justify-start relative"
+        className={cn(
+          "h-full p-0 flex flex-col items-center justify-start relative",
+          activeDeviceView === 'desktop' && showDeviceSelector ? "pt-0" : "", // Adjust padding if header is shown
+          !showDeviceSelector ? "pt-0" : "pt-0" // Ensure no top padding if header is hidden for modal view
+        )}
         style={{ 
           backgroundColor: theme.backgroundColor,
           fontFamily: theme.fontFamily,
@@ -58,7 +85,10 @@ export const ProfilePreview: React.FC<ProfilePreviewProps> = ({ links, theme, ac
             data-ai-hint="background pattern"
           />
         )}
-        <div className="relative z-10 flex flex-col items-center p-6 pt-12 w-full max-w-md mx-auto">
+        <div className={cn(
+            "relative z-10 flex flex-col items-center p-6 w-full max-w-md mx-auto",
+            showDeviceSelector ? "pt-6" : "pt-12" // More top padding if no header
+        )}>
           <Avatar className="w-24 h-24 mb-4 border-4" style={{ borderColor: theme.primaryColor }}>
             <AvatarImage src={theme.profileImageUrl || "https://placehold.co/100x100.png"} alt={profileName} data-ai-hint="avatar user" />
             <AvatarFallback style={{ backgroundColor: theme.accentColor, color: getContrastColor(theme.accentColor) }}>
@@ -87,7 +117,7 @@ export const ProfilePreview: React.FC<ProfilePreviewProps> = ({ links, theme, ac
                 style={{ 
                   backgroundColor: theme.primaryColor, 
                   color: textColor,
-                  ringColor: theme.accentColor,
+                  ringColor: theme.accentColor, // For focus ring, if needed via Tailwind utility
                  }}
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.accentColor}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.primaryColor}

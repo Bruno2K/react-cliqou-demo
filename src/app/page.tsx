@@ -5,13 +5,13 @@ import React, { useState, useEffect, useMemo } from 'react';
 import type { LinkItem, ThemeSettings } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 import { ThemeEditor } from '@/components/dashboard/theme-editor';
 import { ProfilePreview } from '@/components/dashboard/profile-preview';
 import { EditableLinkItem } from '@/components/dashboard/editable-link-item';
 import { LinkForm } from '@/components/dashboard/link-form';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { PlusCircle, Smartphone, Tablet, Monitor, Settings, Link as LinkIconLucide, Eye } from '@/components/icons';
+import { PlusCircle, Smartphone, Tablet, Monitor, Settings, Link as LinkIconLucide, Eye, X as CloseIcon } from '@/components/icons';
 import { useToast } from "@/hooks/use-toast";
 
 import {
@@ -59,6 +59,7 @@ export default function DashboardPage() {
   
   const [isLinkFormOpen, setIsLinkFormOpen] = useState(false);
   const [editingLink, setEditingLink] = useState<LinkItem | null>(null);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -145,7 +146,10 @@ export default function DashboardPage() {
         <div className="container flex h-14 sm:h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
           <h1 className="text-xl sm:text-2xl font-bold text-primary">LinkedUp</h1>
           <div className="flex items-center gap-1 sm:gap-2">
-             <ThemeToggle />
+            <Button onClick={() => setIsPreviewModalOpen(true)} className="lg:hidden" variant="outline" size="sm">
+              <Eye size={16} className="mr-1 sm:mr-2" /> Preview
+            </Button>
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -192,8 +196,8 @@ export default function DashboardPage() {
             <ThemeEditor theme={theme} onThemeChange={handleThemeChange} />
           </div>
 
-          {/* Right Panel: Preview */}
-          <div className="w-full lg:w-3/5 sticky top-[calc(3.5rem+1rem)] sm:top-[calc(4rem+1.5rem)] self-start"> {/* Adjusted sticky top for header height + main padding */}
+          {/* Right Panel: Preview (Desktop) */}
+          <div className="hidden lg:block w-full lg:w-3/5 sticky top-[calc(3.5rem+1rem)] sm:top-[calc(4rem+1.5rem)] self-start">
             <Card className="shadow-lg">
               <CardHeader className="flex flex-col items-start gap-2 p-3 sm:p-4 md:p-6 sm:flex-row sm:items-center sm:justify-between">
                 <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
@@ -207,13 +211,14 @@ export default function DashboardPage() {
                 </div>
               </CardHeader>
               <CardContent className={activeDeviceView !== 'desktop' ? 'flex justify-center items-start p-2 sm:p-4 overflow-auto' : 'p-0'}>
-                 <ProfilePreview links={links} theme={theme} activeDeviceView={activeDeviceView} />
+                 <ProfilePreview links={links} theme={theme} activeDeviceView={activeDeviceView} showDeviceSelector={true} />
               </CardContent>
             </Card>
           </div>
         </div>
       </main>
 
+      {/* Link Form Dialog */}
       <Dialog open={isLinkFormOpen} onOpenChange={setIsLinkFormOpen}>
         <DialogContent className="w-[90vw] max-w-md sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-lg">
           <LinkForm 
@@ -223,8 +228,14 @@ export default function DashboardPage() {
           />
         </DialogContent>
       </Dialog>
+
+      {/* Preview Modal (Mobile) */}
+      <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
+        <DialogContent className="p-0 w-auto h-auto bg-transparent border-none shadow-none data-[state=open]:zoom-in-90 sm:rounded-lg">
+           {/* The X close button is part of DialogContent by default in shadcn */}
+          <ProfilePreview links={links} theme={theme} activeDeviceView="mobile" showDeviceSelector={false} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
-
-    
