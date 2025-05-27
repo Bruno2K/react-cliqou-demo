@@ -16,9 +16,9 @@ import {
 } from '@/components/ui/sidebar';
 import { AnalyticsTopbar } from '@/components/dashboard/analytics/topbar';
 import { KpiCard } from '@/components/dashboard/analytics/kpi-card';
-import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink } from '@/components/icons';
+import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays } from '@/components/icons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, PieChart } from 'recharts'; // Using recharts directly for more control
+import { LineChart, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, Bar } from 'recharts'; // Using recharts directly for more control
 
 // Mock Data
 const kpiData = [
@@ -30,19 +30,26 @@ const kpiData = [
   { title: 'Bounce Rate', value: '33.1%', change: '-1.8%', changeType: 'positive', icon: <TrendingDown size={24} className="text-primary" /> },
 ];
 
-const engagementData = [
+const dailyClicksData = [
   { name: 'Dia 1', cliques: 400 }, { name: 'Dia 5', cliques: 189 }, { name: 'Dia 10', cliques: 239 },
   { name: 'Dia 15', cliques: 349 }, { name: 'Dia 20', cliques: 200 }, { name: 'Dia 25', cliques: 278 },
   { name: 'Dia 30', cliques: 450 },
 ];
 
-const deviceData = [
-  { name: 'Mobile', value: 65, color: 'hsl(var(--chart-1))' },
-  { name: 'Desktop', value: 30, color: 'hsl(var(--chart-2))' },
-  { name: 'Tablet', value: 5, color: 'hsl(var(--chart-3))' },
+const accessOriginData = [
+  { name: 'Orgânico', acessos: 1234, fill: 'hsl(var(--chart-1))' },
+  { name: 'Social', acessos: 987, fill: 'hsl(var(--chart-2))' },
+  { name: 'Direto', acessos: 765, fill: 'hsl(var(--chart-3))' },
+  { name: 'Referência', acessos: 321, fill: 'hsl(var(--chart-4))' },
 ];
 
-// Helper for device size in PieChart
+const returnRateData = [
+  { name: 'Novos Usuários', value: 65, color: 'hsl(var(--chart-1))' },
+  { name: 'Usuários Recorrentes', value: 35, color: 'hsl(var(--chart-2))' },
+];
+
+
+// Helper for device size in PieChart (can be removed if device chart is moved)
 const getActiveDeviceView = () => {
     if (typeof window !== 'undefined') {
         return window.innerWidth < 768 ? 'mobile' : 'desktop';
@@ -53,11 +60,12 @@ const getActiveDeviceView = () => {
 
 export default function AnalyticsDashboardPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
-  const [activeDeviceView, setActiveDeviceView] = useState<'mobile' | 'desktop'>('desktop');
+  // This state might be reused for other charts if needed for responsiveness
+  const [activePieChartSizeView, setActivePieChartSizeView] = useState<'mobile' | 'desktop'>('desktop');
 
   useEffect(() => {
     const handleResize = () => {
-      setActiveDeviceView(getActiveDeviceView());
+      setActivePieChartSizeView(getActiveDeviceView());
     };
     handleResize(); // Set initial value
     window.addEventListener('resize', handleResize);
@@ -68,8 +76,8 @@ export default function AnalyticsDashboardPage() {
   return (
     <SidebarProvider defaultOpen>
       <Sidebar
-        variant="sidebar" // "sidebar", "floating", "inset"
-        collapsible="icon" // "offcanvas", "icon", "none"
+        variant="sidebar" 
+        collapsible="icon" 
         className="border-r"
       >
         <SidebarHeader className="p-4">
@@ -85,7 +93,7 @@ export default function AnalyticsDashboardPage() {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Engajamento">
+              <SidebarMenuButton tooltip="Engajamento" isActive>
                 <Activity />
                 Engajamento
               </SidebarMenuButton>
@@ -168,20 +176,21 @@ export default function AnalyticsDashboardPage() {
             </div>
           </section>
 
-          {/* Engajamento dos usuários - Gráfico de linha e Gráfico de Pizza */}
+          {/* Engajamento dos usuários */}
           <section id="engagement" className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-foreground">Engajamento dos Usuários</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+              {/* Cliques por Dia (Últimos 30 dias) - Gráfico de Linha */}
               <Card className="shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
-                    <BarChart3 size={20} />
+                    <TrendingUp size={20} />
                     Cliques por Dia (Últimos 30 dias)
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px] sm:h-[350px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={engagementData}>
+                    <LineChart data={dailyClicksData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                       <XAxis dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12} />
                       <YAxis tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12}/>
@@ -195,33 +204,68 @@ export default function AnalyticsDashboardPage() {
                         itemStyle={{ color: 'hsl(var(--primary))' }}
                       />
                       <Legend wrapperStyle={{fontSize: '12px'}}/>
-                      <Line type="monotone" dataKey="cliques" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4, fill: 'hsl(var(--primary))' }} activeDot={{ r: 6 }} />
+                      <Line type="monotone" dataKey="cliques" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4, fill: 'hsl(var(--primary))' }} activeDot={{ r: 6 }} name="Cliques"/>
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
               
+              {/* Origem dos Acessos - Gráfico de Barras */}
               <Card className="shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-lg">
-                    <PieChartIcon size={20} />
-                    Tipos de Dispositivo
+                    <ExternalLink size={20} />
+                    Origem dos Acessos
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px] sm:h-[350px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={accessOriginData} layout="vertical" margin={{ right: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis type="number" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12} />
+                      <YAxis type="category" dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12} width={80} />
+                      <Tooltip
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--background))', 
+                          borderColor: 'hsl(var(--border))',
+                          borderRadius: 'var(--radius)',
+                        }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
+                        formatter={(value, name, props) => [value, props.payload.name]}
+                      />
+                      <Legend wrapperStyle={{fontSize: '12px'}}/>
+                      <Bar dataKey="acessos" name="Acessos" barSize={20}>
+                        {accessOriginData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Taxa de Retorno (Novos vs Recorrentes) - Gráfico de Pizza */}
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Users size={20} />
+                    Taxa de Retorno
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="h-[300px] sm:h-[350px] flex items-center justify-center">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={deviceData}
+                        data={returnRateData}
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        outerRadius={Math.min(typeof window !== 'undefined' ? window.innerWidth : 300, typeof window !== 'undefined' ? window.innerHeight : 300) / (activeDeviceView === 'mobile' ? 7 : 9)}
+                        outerRadius={Math.min(typeof window !== 'undefined' ? window.innerWidth : 300, typeof window !== 'undefined' ? window.innerHeight : 300) / (activePieChartSizeView === 'mobile' ? 7 : 9)}
                         fill="#8884d8"
                         dataKey="value"
                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                       >
-                        {deviceData.map((entry, index) => (
+                        {returnRateData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
@@ -236,6 +280,22 @@ export default function AnalyticsDashboardPage() {
                        <Legend wrapperStyle={{fontSize: '12px', paddingTop: '20px'}} layout="horizontal" verticalAlign="bottom" align="center" />
                     </PieChart>
                   </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              {/* Mapa de Calor por Horário - Placeholder */}
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <CalendarDays size={20} />
+                    Atividade por Horário (Heatmap)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px] sm:h-[350px] flex items-center justify-center">
+                  <div className="text-center">
+                    <Activity size={48} className="mx-auto text-muted-foreground mb-2" />
+                    <p className="text-muted-foreground">Mapa de calor de atividade por horário em breve.</p>
+                  </div>
                 </CardContent>
               </Card>
             </div>
@@ -258,3 +318,4 @@ export default function AnalyticsDashboardPage() {
     </SidebarProvider>
   );
 }
+
