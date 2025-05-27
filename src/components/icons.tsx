@@ -24,15 +24,18 @@ export const IconRenderer: React.FC<{ name?: string; className?: string; size?: 
   if (!name) return <LucideIcons.Link className={className} size={size} />;
   
   // Capitalize first letter and ensure camelCase for icon names if needed (e.g., "linkedin" -> "Linkedin")
-  const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+  // Also handle cases like 'GitHub' -> 'Github' if Lucide expects that
+  let formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+  if (formattedName === "Github") formattedName = "GitHub"; // Lucide specific casing
+  if (formattedName === "Linkedin") formattedName = "Linkedin";
+
 
   if (formattedName in LucideIcons) {
     return <DynamicIcon name={formattedName as IconName} className={className} size={size} />;
   }
   
   // Fallback for icons not directly in Lucide or simple custom SVGs
-  // For now, default to a generic link icon
-  return <LucideIcons.Link className={className} size={size} />;
+  return <LucideIcons.Link className={className} size={size} />; // Default to a generic link icon
 };
 
 // Export commonly used icons for convenience if needed
@@ -80,7 +83,9 @@ export const {
   FileText,
   Settings2, 
   Mail,
-  AlertCircle, 
+  AlertCircle,
+  Filter,
+  MoreHorizontal, 
 } = LucideIcons;
 
 // Export Image as ImageIcon separately

@@ -17,9 +17,29 @@ import {
 } from '@/components/ui/sidebar';
 import { AnalyticsTopbar } from '@/components/dashboard/analytics/topbar';
 import { KpiCard } from '@/components/dashboard/analytics/kpi-card';
-import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3 } from '@/components/icons';
+import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3, Filter, MoreHorizontal, ChevronDown } from '@/components/icons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, BarChart, PieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, Bar } from 'recharts';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 // Mock Data
 const kpiData = [
@@ -49,6 +69,25 @@ const returnRateData = [
   { name: 'Usuários Recorrentes', value: 35, color: 'hsl(var(--chart-2))' },
 ];
 
+interface LinkPerformanceItem {
+  id: string;
+  name: string;
+  url: string;
+  totalClicks: number;
+  clicksByDevice: string; // e.g., "M:150 D:300 T:50"
+  clicksByRegion: string; // e.g., "BR:60% US:20% Outros:20%"
+  status: 'active' | 'inactive';
+}
+
+const linkPerformanceData: LinkPerformanceItem[] = [
+  { id: 'link1', name: 'Meu Portfólio Incrível', url: 'https://portfolio.example.com', totalClicks: 1250, clicksByDevice: 'M:700 D:500 T:50', clicksByRegion: 'BR:70% US:15% Outros:15%', status: 'active' },
+  { id: 'link2', name: 'Produto X - Página de Vendas', url: 'https://produto-x.example.com', totalClicks: 870, clicksByDevice: 'M:400 D:450 T:20', clicksByRegion: 'BR:50% PT:30% Outros:20%', status: 'active' },
+  { id: 'link3', name: 'Campanha de Natal (Expirada)', url: 'https://campanha-natal.example.com', totalClicks: 320, clicksByDevice: 'M:200 D:100 T:20', clicksByRegion: 'BR:90% Outros:10%', status: 'inactive' },
+  { id: 'link4', name: 'Blog Post: Novidades', url: 'https://blog.example.com/novidades', totalClicks: 1500, clicksByDevice: 'M:800 D:600 T:100', clicksByRegion: 'Global:100%', status: 'active' },
+  { id: 'link5', name: 'Linktree Antigo (Desativado)', url: 'https://linktr.ee/oldprofile', totalClicks: 50, clicksByDevice: 'M:30 D:15 T:5', clicksByRegion: 'N/A', status: 'inactive' },
+];
+
+
 // Helper for device size in PieChart
 const getActiveDeviceView = () => {
     if (typeof window !== 'undefined') {
@@ -65,11 +104,26 @@ export default function AnalyticsDashboardPage() {
   const [activeView, setActiveView] = useState<ActiveView>('overview');
   const [activePieChartSizeView, setActivePieChartSizeView] = useState<'mobile' | 'desktop'>('desktop');
 
+  // Filters for Link Performance
+  const [statusFilter, setStatusFilter] = useState<Record<LinkPerformanceItem['status'], boolean>>({ active: true, inactive: true });
+  const [performanceFilter, setPerformanceFilter] = useState<string>('all'); // 'all', 'top', 'bottom'
+
+  const handleStatusFilterChange = (status: LinkPerformanceItem['status']) => {
+    setStatusFilter(prev => ({ ...prev, [status]: !prev[status] }));
+  };
+
+  const filteredLinkPerformanceData = linkPerformanceData.filter(link => {
+    const isStatusMatch = (statusFilter.active && link.status === 'active') || (statusFilter.inactive && link.status === 'inactive');
+    // Placeholder for performance filter logic
+    return isStatusMatch;
+  });
+
+
   useEffect(() => {
     const handleResize = () => {
       setActivePieChartSizeView(getActiveDeviceView());
     };
-    handleResize(); 
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -78,8 +132,8 @@ export default function AnalyticsDashboardPage() {
   return (
     <SidebarProvider defaultOpen>
       <Sidebar
-        variant="sidebar" 
-        collapsible="icon" 
+        variant="sidebar"
+        collapsible="icon"
         className="border-r"
       >
         <SidebarHeader className="p-4">
@@ -218,8 +272,8 @@ export default function AnalyticsDashboardPage() {
                         <XAxis dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12} />
                         <YAxis tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12}/>
                         <Tooltip
-                          contentStyle={{ 
-                            backgroundColor: 'hsl(var(--background))', 
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--background))',
                             borderColor: 'hsl(var(--border))',
                             borderRadius: 'var(--radius)',
                           }}
@@ -232,7 +286,7 @@ export default function AnalyticsDashboardPage() {
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
-                
+
                 {/* Origem dos Acessos - Gráfico de Barras */}
                 <Card className="shadow-lg">
                   <CardHeader>
@@ -248,8 +302,8 @@ export default function AnalyticsDashboardPage() {
                         <XAxis type="number" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12} />
                         <YAxis type="category" dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12} width={80} />
                         <Tooltip
-                          contentStyle={{ 
-                            backgroundColor: 'hsl(var(--background))', 
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--background))',
                             borderColor: 'hsl(var(--border))',
                             borderRadius: 'var(--radius)',
                           }}
@@ -293,8 +347,8 @@ export default function AnalyticsDashboardPage() {
                           ))}
                         </Pie>
                         <Tooltip
-                          contentStyle={{ 
-                            backgroundColor: 'hsl(var(--background))', 
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--background))',
                             borderColor: 'hsl(var(--border))',
                             borderRadius: 'var(--radius)',
                           }}
@@ -324,9 +378,108 @@ export default function AnalyticsDashboardPage() {
               </div>
             </section>
           )}
-           
+
+          {activeView === 'link-performance' && (
+            <section id="link-performance" className="mb-8">
+              <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                <h2 className="text-2xl font-semibold text-foreground">Desempenho por Link</h2>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" className="flex items-center gap-2">
+                        <Filter size={16} /> Status <ChevronDown size={16} className="opacity-70" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Filtrar por Status</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuCheckboxItem
+                        checked={statusFilter.active}
+                        onCheckedChange={() => handleStatusFilterChange('active')}
+                      >
+                        Ativo
+                      </DropdownMenuCheckboxItem>
+                      <DropdownMenuCheckboxItem
+                        checked={statusFilter.inactive}
+                        onCheckedChange={() => handleStatusFilterChange('inactive')}
+                      >
+                        Inativo
+                      </DropdownMenuCheckboxItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" className="flex items-center gap-2">
+                        <TrendingUp size={16} /> Performance <ChevronDown size={16} className="opacity-70" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Filtrar por Performance</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onSelect={() => setPerformanceFilter('all')}>Todos</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => setPerformanceFilter('top')}>Mais Clicados</DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => setPerformanceFilter('bottom')}>Menos Clicados</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  {/* Date filter is global from Topbar */}
+                </div>
+              </div>
+
+              <Card className="shadow-lg">
+                <CardContent className="p-0"> {/* Remove padding for full-width table */}
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="min-w-[200px]">Nome do Link</TableHead>
+                          <TableHead className="min-w-[150px]">URL</TableHead>
+                          <TableHead className="text-right">Cliques Totais</TableHead>
+                          <TableHead className="min-w-[150px]">Cliques/Dispositivo</TableHead>
+                          <TableHead className="min-w-[150px]">Cliques/Região</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredLinkPerformanceData.length > 0 ? (
+                          filteredLinkPerformanceData.map((link) => (
+                            <TableRow key={link.id}>
+                              <TableCell className="font-medium truncate max-w-xs" title={link.name}>{link.name}</TableCell>
+                              <TableCell className="truncate max-w-xs" title={link.url}><a href={link.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{link.url}</a></TableCell>
+                              <TableCell className="text-right">{link.totalClicks.toLocaleString()}</TableCell>
+                              <TableCell>{link.clicksByDevice}</TableCell>
+                              <TableCell>{link.clicksByRegion}</TableCell>
+                              <TableCell>
+                                <Badge variant={link.status === 'active' ? 'default' : 'secondary'}
+                                  className={cn(link.status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-700 dark:text-green-100' : 'bg-red-100 text-red-700 dark:bg-red-700 dark:text-red-100')}
+                                >
+                                  {link.status === 'active' ? 'Ativo' : 'Inativo'}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="icon" onClick={() => console.log('Detalhar link:', link.id)} aria-label="Detalhar link">
+                                  <MoreHorizontal size={18} />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={7} className="text-center h-24">
+                              Nenhum link encontrado com os filtros atuais.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+          )}
+
           {/* Placeholder for other views - you can add more else-if blocks for other activeView values */}
-          {activeView !== 'overview' && activeView !== 'engagement' && (
+          {activeView !== 'overview' && activeView !== 'engagement' && activeView !== 'link-performance' && (
             <section className="mb-8">
                <Card>
                   <CardHeader>
@@ -344,4 +497,3 @@ export default function AnalyticsDashboardPage() {
     </SidebarProvider>
   );
 }
-
