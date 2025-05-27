@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as LucideIcons from 'lucide-react';
@@ -35,4 +36,28 @@ export const IconRenderer: React.FC<{ name?: string; className?: string; size?: 
 };
 
 // Export commonly used icons for convenience if needed
-export const { Link, Briefcase, Linkedin, Github, Palette, Sparkles, GripVertical, PlusCircle, Trash2, Edit3, Eye, Smartphone, Tablet, Monitor, Settings, Image as ImageIcon, UserCircle, ArrowDown, ArrowUp, ToggleLeft, ToggleRight } = LucideIcons;
+export const { 
+  Link, 
+  Briefcase, 
+  Linkedin, 
+  Github, 
+  Palette, 
+  Sparkles, 
+  GripVertical, 
+  PlusCircle, 
+  Trash2, 
+  Edit3, 
+  Eye, 
+  Smartphone, 
+  Tablet, 
+  Monitor, 
+  Settings, 
+  UserCircle, 
+  ArrowDown, 
+  ArrowUp, 
+  ToggleLeft, 
+  ToggleRight 
+} = LucideIcons;
+
+// Export Image as ImageIcon separately
+export const { Image: ImageIcon } = LucideIcons;
