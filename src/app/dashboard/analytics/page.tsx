@@ -89,7 +89,7 @@ const linkPerformanceData: LinkPerformanceItem[] = [
 
 
 // Helper for device size in PieChart
-const getActiveDeviceView = () => {
+const getActiveDeviceViewHelper = () => { // Renamed to avoid conflict
     if (typeof window !== 'undefined') {
         return window.innerWidth < 768 ? 'mobile' : 'desktop';
     }
@@ -121,7 +121,7 @@ export default function AnalyticsDashboardPage() {
 
   useEffect(() => {
     const handleResize = () => {
-      setActivePieChartSizeView(getActiveDeviceView());
+      setActivePieChartSizeView(getActiveDeviceViewHelper());
     };
     handleResize(); // Initial call
     window.addEventListener('resize', handleResize);
@@ -478,7 +478,7 @@ export default function AnalyticsDashboardPage() {
             </section>
           )}
 
-          {/* Placeholder for other views - you can add more else-if blocks for other activeView values */}
+          {/* Placeholder for other views */}
           {activeView !== 'overview' && activeView !== 'engagement' && activeView !== 'link-performance' && (
             <section className="mb-8">
                <Card>
@@ -497,5 +497,3 @@ export default function AnalyticsDashboardPage() {
     </SidebarProvider>
   );
 }
-
-    
