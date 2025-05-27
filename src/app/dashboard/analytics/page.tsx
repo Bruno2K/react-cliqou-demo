@@ -109,6 +109,27 @@ const regionAccessData = [
     { region: 'California, US', accesses: 6100, change: '+3%' },
 ];
 
+const conversionRateByLinkData = [
+  { id: 'linkA', name: 'Link de Venda Principal', views: 5230, conversions: 261, rate: '5.0%' },
+  { id: 'linkB', name: 'Ebook Gratuito', views: 12050, conversions: 1807, rate: '15.0%' },
+  { id: 'linkC', name: 'Inscrição Webinar', views: 2500, conversions: 375, rate: '15.0%' },
+  { id: 'linkD', name: 'Link Afiliado X', views: 850, conversions: 42, rate: '4.9%' },
+];
+
+const ctaInteractionsData = [
+  { name: 'Botão "Comprar Agora"', interactions: 750, fill: 'hsl(var(--chart-1))' },
+  { name: 'Link "Saiba Mais"', interactions: 1230, fill: 'hsl(var(--chart-2))' },
+  { name: 'Banner "Promoção"', interactions: 450, fill: 'hsl(var(--chart-3))' },
+  { name: 'Pop-up "Newsletter"', interactions: 980, fill: 'hsl(var(--chart-4))' },
+];
+
+const externalLinkClicksData = [
+  { id: 'ext1', name: 'Contato WhatsApp', clicks: 320 },
+  { id: 'ext2', name: 'Perfil Instagram', clicks: 1500 },
+  { id: 'ext3', name: 'Loja Parceira', clicks: 88 },
+  { id: 'ext4', name: 'Canal YouTube', clicks: 650 },
+];
+
 
 // Helper for device size in PieChart
 const getActiveDeviceViewHelper = () => {
@@ -637,12 +658,28 @@ export default function AnalyticsDashboardPage() {
                       Taxa de Conversão por Link
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="h-[200px] flex items-center justify-center">
-                    <div className="text-center">
-                      <TargetIcon size={40} className="mx-auto text-muted-foreground mb-2" />
-                      <p className="text-muted-foreground">Dados de taxa de conversão por link em breve.</p>
-                       <p className="text-xs text-muted-foreground mt-1">(Ex: Tabela ou gráfico de barras)</p>
-                    </div>
+                  <CardContent className="pt-4">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Link</TableHead>
+                          <TableHead className="text-right">Visualizações</TableHead>
+                          <TableHead className="text-right">Conversões</TableHead>
+                          <TableHead className="text-right">Taxa (%)</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {conversionRateByLinkData.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell className="font-medium">{item.name}</TableCell>
+                            <TableCell className="text-right">{item.views.toLocaleString()}</TableCell>
+                            <TableCell className="text-right">{item.conversions.toLocaleString()}</TableCell>
+                            <TableCell className="text-right">{item.rate}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                     <p className="text-xs text-muted-foreground mt-4 text-center">Tabela com mais detalhes e filtros em breve.</p>
                   </CardContent>
                 </Card>
 
@@ -653,12 +690,28 @@ export default function AnalyticsDashboardPage() {
                       Interações com Botões CTA
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="h-[200px] flex items-center justify-center">
-                     <div className="text-center">
-                      <MousePointerClick size={40} className="mx-auto text-muted-foreground mb-2" />
-                      <p className="text-muted-foreground">Contagem de interações com CTAs em breve.</p>
-                      <p className="text-xs text-muted-foreground mt-1">(Ex: Gráfico de barras por CTA)</p>
-                    </div>
+                  <CardContent className="h-[300px] sm:h-[350px]">
+                     <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={ctaInteractionsData} layout="horizontal" margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
+                           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                           <XAxis dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={10} interval={0} angle={-30} textAnchor="end" height={60}/>
+                           <YAxis tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12}/>
+                           <Tooltip
+                            contentStyle={{
+                              backgroundColor: 'hsl(var(--background))',
+                              borderColor: 'hsl(var(--border))',
+                              borderRadius: 'var(--radius)',
+                            }}
+                            labelStyle={{ color: 'hsl(var(--foreground))' }}
+                           />
+                           <Legend wrapperStyle={{fontSize: '12px'}}/>
+                           <Bar dataKey="interactions" name="Interações">
+                            {ctaInteractionsData.map((entry, index) => (
+                                <Cell key={`cell-cta-${index}`} fill={entry.fill} />
+                            ))}
+                           </Bar>
+                        </BarChart>
+                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
 
@@ -669,12 +722,24 @@ export default function AnalyticsDashboardPage() {
                       Cliques em Links Externos
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="h-[200px] flex items-center justify-center">
-                     <div className="text-center">
-                      <ExternalLink size={40} className="mx-auto text-muted-foreground mb-2" />
-                      <p className="text-muted-foreground">Rastreamento de cliques em links externos em breve.</p>
-                       <p className="text-xs text-muted-foreground mt-1">(Ex: Tabela de links externos e seus cliques)</p>
-                    </div>
+                  <CardContent className="pt-4">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Nome/Destino do Link</TableHead>
+                          <TableHead className="text-right">Cliques</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {externalLinkClicksData.map((item) => (
+                          <TableRow key={item.id}>
+                            <TableCell className="font-medium">{item.name}</TableCell>
+                            <TableCell className="text-right">{item.clicks.toLocaleString()}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    <p className="text-xs text-muted-foreground mt-4 text-center">Detalhes e agrupamento por tipo em breve.</p>
                   </CardContent>
                 </Card>
 
@@ -688,8 +753,8 @@ export default function AnalyticsDashboardPage() {
                   <CardContent className="h-[200px] flex items-center justify-center">
                     <div className="text-center">
                       <Activity size={40} className="mx-auto text-muted-foreground mb-2" />
-                      <p className="text-muted-foreground">Integração com eventos personalizados em breve.</p>
-                      <p className="text-xs text-muted-foreground mt-1">(Ex: Scroll depth, hover em elementos chave)</p>
+                      <p className="text-muted-foreground">Acompanhamento de eventos customizados (ex: scroll depth, hover em elementos chave, visualização de vídeo) em breve.</p>
+                      <p className="text-xs text-muted-foreground mt-1">Isso permitirá uma análise mais granular do comportamento do usuário.</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -716,3 +781,4 @@ export default function AnalyticsDashboardPage() {
     </SidebarProvider>
   );
 }
+
