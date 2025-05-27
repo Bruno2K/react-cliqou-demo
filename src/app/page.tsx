@@ -10,7 +10,7 @@ import { ProfilePreview } from '@/components/dashboard/profile-preview';
 import { EditableLinkItem } from '@/components/dashboard/editable-link-item';
 import { LinkForm } from '@/components/dashboard/link-form';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { PlusCircle, Smartphone, Tablet, Monitor, Settings, Link as LinkIconLucide } from '@/components/icons';
+import { PlusCircle, Smartphone, Tablet, Monitor, Settings, Link as LinkIconLucide, Eye } from '@/components/icons';
 import { useToast } from "@/hooks/use-toast";
 
 import {
