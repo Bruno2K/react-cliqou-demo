@@ -18,7 +18,7 @@ import { AnalyticsTopbar } from '@/components/dashboard/analytics/topbar';
 import { KpiCard } from '@/components/dashboard/analytics/kpi-card';
 import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays } from '@/components/icons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, BarChart, PieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, Bar } from 'recharts'; // Using recharts directly for more control
+import { LineChart, BarChart, PieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, Bar } from 'recharts';
 
 // Mock Data
 const kpiData = [
@@ -48,8 +48,7 @@ const returnRateData = [
   { name: 'Usuários Recorrentes', value: 35, color: 'hsl(var(--chart-2))' },
 ];
 
-
-// Helper for device size in PieChart (can be removed if device chart is moved)
+// Helper for device size in PieChart
 const getActiveDeviceView = () => {
     if (typeof window !== 'undefined') {
         return window.innerWidth < 768 ? 'mobile' : 'desktop';
@@ -57,17 +56,19 @@ const getActiveDeviceView = () => {
     return 'desktop'; // Default for SSR or non-browser environments
 };
 
+type ActiveView = 'overview' | 'engagement' | 'link-performance' | 'devices' | 'geolocation' | 'conversions' | 'technical-performance';
+
 
 export default function AnalyticsDashboardPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
-  // This state might be reused for other charts if needed for responsiveness
+  const [activeView, setActiveView] = useState<ActiveView>('overview');
   const [activePieChartSizeView, setActivePieChartSizeView] = useState<'mobile' | 'desktop'>('desktop');
 
   useEffect(() => {
     const handleResize = () => {
       setActivePieChartSizeView(getActiveDeviceView());
     };
-    handleResize(); // Set initial value
+    handleResize(); 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -87,43 +88,43 @@ export default function AnalyticsDashboardPage() {
         <SidebarContent className="p-2">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton isActive tooltip="Visão Geral">
+              <SidebarMenuButton isActive={activeView === 'overview'} onClick={() => setActiveView('overview')} tooltip="Visão Geral">
                 <LayoutDashboard />
                 Visão Geral
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Engajamento" isActive>
+              <SidebarMenuButton isActive={activeView === 'engagement'} onClick={() => setActiveView('engagement')} tooltip="Engajamento">
                 <Activity />
                 Engajamento
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Desempenho por Link">
+              <SidebarMenuButton isActive={activeView === 'link-performance'} onClick={() => setActiveView('link-performance')} tooltip="Desempenho por Link">
                 <LinkIcon />
                 Desempenho por Link
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Dispositivos">
+              <SidebarMenuButton isActive={activeView === 'devices'} onClick={() => setActiveView('devices')} tooltip="Dispositivos">
                 <PieChartIcon />
                 Dispositivos
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Geolocalização">
+              <SidebarMenuButton isActive={activeView === 'geolocation'} onClick={() => setActiveView('geolocation')} tooltip="Geolocalização">
                 <MapPin />
                 Geolocalização
               </SidebarMenuButton>
             </SidebarMenuItem>
              <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Conversões">
+              <SidebarMenuButton isActive={activeView === 'conversions'} onClick={() => setActiveView('conversions')} tooltip="Conversões">
                 <TargetIcon />
                 Conversões
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Performance Técnica">
+              <SidebarMenuButton isActive={activeView === 'technical-performance'} onClick={() => setActiveView('technical-performance')} tooltip="Performance Técnica">
                 <TrendingUp />
                 Performance Técnica
               </SidebarMenuButton>
@@ -158,164 +159,179 @@ export default function AnalyticsDashboardPage() {
         />
 
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-muted/30">
-          {/* Visão Geral (Top KPIs) */}
-          <section id="overview" className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-foreground">Visão Geral</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 md:gap-6">
-              {kpiData.map((kpi) => (
-                <KpiCard
-                  key={kpi.title}
-                  title={kpi.title}
-                  value={kpi.value}
-                  change={kpi.change}
-                  changeType={kpi.changeType as 'positive' | 'negative'}
-                  icon={kpi.icon}
-                  tooltipText={`Detalhes sobre ${kpi.title}`}
-                />
-              ))}
-            </div>
-          </section>
+          {activeView === 'overview' && (
+            <>
+              <section id="overview" className="mb-8">
+                <h2 className="text-2xl font-semibold mb-4 text-foreground">Visão Geral</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 md:gap-6">
+                  {kpiData.map((kpi) => (
+                    <KpiCard
+                      key={kpi.title}
+                      title={kpi.title}
+                      value={kpi.value}
+                      change={kpi.change}
+                      changeType={kpi.changeType as 'positive' | 'negative'}
+                      icon={kpi.icon}
+                      tooltipText={`Detalhes sobre ${kpi.title}`}
+                    />
+                  ))}
+                </div>
+              </section>
+              <section className="mb-8">
+                 <Card>
+                    <CardHeader>
+                      <CardTitle>Mais Seções em Breve...</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground">Outras seções como Desempenho por Link, Geolocalização, etc., serão adicionadas aqui quando selecionadas na sidebar.</p>
+                    </CardContent>
+                 </Card>
+              </section>
+            </>
+          )}
 
-          {/* Engajamento dos usuários */}
-          <section id="engagement" className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-foreground">Engajamento dos Usuários</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-              {/* Cliques por Dia (Últimos 30 dias) - Gráfico de Linha */}
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <TrendingUp size={20} />
-                    Cliques por Dia (Últimos 30 dias)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-[300px] sm:h-[350px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={dailyClicksData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12} />
-                      <YAxis tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12}/>
-                      <Tooltip
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--background))', 
-                          borderColor: 'hsl(var(--border))',
-                          borderRadius: 'var(--radius)',
-                        }}
-                        labelStyle={{ color: 'hsl(var(--foreground))' }}
-                        itemStyle={{ color: 'hsl(var(--primary))' }}
-                      />
-                      <Legend wrapperStyle={{fontSize: '12px'}}/>
-                      <Line type="monotone" dataKey="cliques" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4, fill: 'hsl(var(--primary))' }} activeDot={{ r: 6 }} name="Cliques"/>
-                    </LineChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-              
-              {/* Origem dos Acessos - Gráfico de Barras */}
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <ExternalLink size={20} />
-                    Origem dos Acessos
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-[300px] sm:h-[350px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={accessOriginData} layout="vertical" margin={{ right: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                      <XAxis type="number" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12} />
-                      <YAxis type="category" dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12} width={80} />
-                      <Tooltip
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--background))', 
-                          borderColor: 'hsl(var(--border))',
-                          borderRadius: 'var(--radius)',
-                        }}
-                        labelStyle={{ color: 'hsl(var(--foreground))' }}
-                        formatter={(value, name, props) => [value, props.payload.name]}
-                      />
-                      <Legend wrapperStyle={{fontSize: '12px'}}/>
-                      <Bar dataKey="acessos" name="Acessos" barSize={20}>
-                        {accessOriginData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
+          {activeView === 'engagement' && (
+            <section id="engagement" className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">Engajamento dos Usuários</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+                {/* Cliques por Dia (Últimos 30 dias) - Gráfico de Linha */}
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <TrendingUp size={20} />
+                      Cliques por Dia (Últimos 30 dias)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[300px] sm:h-[350px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={dailyClicksData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12} />
+                        <YAxis tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12}/>
+                        <Tooltip
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--background))', 
+                            borderColor: 'hsl(var(--border))',
+                            borderRadius: 'var(--radius)',
+                          }}
+                          labelStyle={{ color: 'hsl(var(--foreground))' }}
+                          itemStyle={{ color: 'hsl(var(--primary))' }}
+                        />
+                        <Legend wrapperStyle={{fontSize: '12px'}}/>
+                        <Line type="monotone" dataKey="cliques" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4, fill: 'hsl(var(--primary))' }} activeDot={{ r: 6 }} name="Cliques"/>
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
+                
+                {/* Origem dos Acessos - Gráfico de Barras */}
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <ExternalLink size={20} />
+                      Origem dos Acessos
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[300px] sm:h-[350px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={accessOriginData} layout="vertical" margin={{ right: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis type="number" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12} />
+                        <YAxis type="category" dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))' }} fontSize={12} width={80} />
+                        <Tooltip
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--background))', 
+                            borderColor: 'hsl(var(--border))',
+                            borderRadius: 'var(--radius)',
+                          }}
+                          labelStyle={{ color: 'hsl(var(--foreground))' }}
+                          formatter={(value, name, props) => [value, props.payload.name]}
+                        />
+                        <Legend wrapperStyle={{fontSize: '12px'}}/>
+                        <Bar dataKey="acessos" name="Acessos" barSize={20}>
+                          {accessOriginData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
 
-              {/* Taxa de Retorno (Novos vs Recorrentes) - Gráfico de Pizza */}
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Users size={20} />
-                    Taxa de Retorno
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-[300px] sm:h-[350px] flex items-center justify-center">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={returnRateData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={Math.min(typeof window !== 'undefined' ? window.innerWidth : 300, typeof window !== 'undefined' ? window.innerHeight : 300) / (activePieChartSizeView === 'mobile' ? 7 : 9)}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      >
-                        {returnRateData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--background))', 
-                          borderColor: 'hsl(var(--border))',
-                          borderRadius: 'var(--radius)',
-                        }}
-                         formatter={(value, name) => [`${value}%`, name]}
-                      />
-                       <Legend wrapperStyle={{fontSize: '12px', paddingTop: '20px'}} layout="horizontal" verticalAlign="bottom" align="center" />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
+                {/* Taxa de Retorno (Novos vs Recorrentes) - Gráfico de Pizza */}
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Users size={20} />
+                      Taxa de Retorno
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[300px] sm:h-[350px] flex items-center justify-center">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={returnRateData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          outerRadius={Math.min(typeof window !== 'undefined' ? window.innerWidth : 300, typeof window !== 'undefined' ? window.innerHeight : 300) / (activePieChartSizeView === 'mobile' ? 7 : 9)}
+                          fill="#8884d8"
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {returnRateData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{ 
+                            backgroundColor: 'hsl(var(--background))', 
+                            borderColor: 'hsl(var(--border))',
+                            borderRadius: 'var(--radius)',
+                          }}
+                           formatter={(value, name) => [`${value}%`, name]}
+                        />
+                         <Legend wrapperStyle={{fontSize: '12px', paddingTop: '20px'}} layout="horizontal" verticalAlign="bottom" align="center" />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </CardContent>
+                </Card>
 
-              {/* Mapa de Calor por Horário - Placeholder */}
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <CalendarDays size={20} />
-                    Atividade por Horário (Heatmap)
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="h-[300px] sm:h-[350px] flex items-center justify-center">
-                  <div className="text-center">
-                    <Activity size={48} className="mx-auto text-muted-foreground mb-2" />
-                    <p className="text-muted-foreground">Mapa de calor de atividade por horário em breve.</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </section>
-          
-          {/* Placeholder for other sections */}
-          <section className="mb-8">
-             <Card>
-                <CardHeader>
-                  <CardTitle>Mais Seções em Breve...</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">Outras seções como Desempenho por Link, Geolocalização, etc., serão adicionadas aqui.</p>
-                </CardContent>
-             </Card>
-          </section>
+                {/* Mapa de Calor por Horário - Placeholder */}
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <CalendarDays size={20} />
+                      Atividade por Horário (Heatmap)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[300px] sm:h-[350px] flex items-center justify-center">
+                    <div className="text-center">
+                      <Activity size={48} className="mx-auto text-muted-foreground mb-2" />
+                      <p className="text-muted-foreground">Mapa de calor de atividade por horário em breve.</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+          )}
+           
+          {/* Placeholder for other views - you can add more else-if blocks for other activeView values */}
+          {activeView !== 'overview' && activeView !== 'engagement' && (
+            <section className="mb-8">
+               <Card>
+                  <CardHeader>
+                    <CardTitle>Conteúdo para "{activeView.replace('-', ' ')}" em breve...</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">O conteúdo desta seção será adicionado quando implementado.</p>
+                  </CardContent>
+               </Card>
+            </section>
+          )}
 
         </main>
       </SidebarInset>
     </SidebarProvider>
   );
 }
-
