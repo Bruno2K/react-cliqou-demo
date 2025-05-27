@@ -52,7 +52,7 @@ export const ProfilePreview: React.FC<ProfilePreviewProps> = ({
         !showDeviceSelector && "hidden" // Hide header if device selector is off
       )}>
         <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-          <Eye size={20} className="sm:size-24"/>
+          <Eye size={18} className="sm:w-5 sm:h-5"/>
           Live Preview
         </CardTitle>
         {showDeviceSelector && onDeviceChange && (
@@ -133,3 +133,4 @@ export const ProfilePreview: React.FC<ProfilePreviewProps> = ({
     </Card>
   );
 };
+
