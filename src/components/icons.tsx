@@ -27,7 +27,7 @@ export const IconRenderer: React.FC<{ name?: string; className?: string; size?: 
   // Also handle cases like 'GitHub' -> 'Github' if Lucide expects that
   let formattedName = name.charAt(0).toUpperCase() + name.slice(1);
   if (formattedName === "Github") formattedName = "GitHub"; // Lucide specific casing
-  if (formattedName === "Linkedin") formattedName = "Linkedin";
+  if (formattedName === "Linkedin") formattedName = "Linkedin"; // Lucide specific casing for Linkedin, etc.
 
 
   if (formattedName in LucideIcons) {
@@ -75,18 +75,21 @@ export const {
   Info,
   LayoutDashboard,
   Activity,
-  PieChart: PieChartIcon, 
+  PieChartIcon, 
   BarChart3, 
   MapPin,
-  Target: TargetIcon, 
+  TargetIcon, 
   ExternalLink,
   FileText,
   Settings2, 
   Mail,
   AlertCircle,
   Filter,
-  MoreHorizontal, 
+  MoreHorizontal,
+  Radar, 
 } = LucideIcons;
 
 // Export Image as ImageIcon separately
 export const { Image: ImageIcon } = LucideIcons;
+
+    

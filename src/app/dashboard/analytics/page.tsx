@@ -17,9 +17,9 @@ import {
 } from '@/components/ui/sidebar';
 import { AnalyticsTopbar } from '@/components/dashboard/analytics/topbar';
 import { KpiCard } from '@/components/dashboard/analytics/kpi-card';
-import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3, Filter, MoreHorizontal, ChevronDown } from '@/components/icons';
+import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3, Filter, MoreHorizontal, ChevronDown, Radar } from '@/components/icons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, BarChart, PieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, Bar } from 'recharts';
+import { LineChart, BarChart, PieChart as RechartsPieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, Bar } from 'recharts';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -123,7 +123,7 @@ export default function AnalyticsDashboardPage() {
     const handleResize = () => {
       setActivePieChartSizeView(getActiveDeviceView());
     };
-    handleResize();
+    handleResize(); // Initial call
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -331,7 +331,7 @@ export default function AnalyticsDashboardPage() {
                   </CardHeader>
                   <CardContent className="h-[300px] sm:h-[350px] flex items-center justify-center">
                     <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
+                      <RechartsPieChart>
                         <Pie
                           data={returnRateData}
                           cx="50%"
@@ -355,7 +355,7 @@ export default function AnalyticsDashboardPage() {
                            formatter={(value, name) => [`${value}%`, name]}
                         />
                          <Legend wrapperStyle={{fontSize: '12px', paddingTop: '20px'}} layout="horizontal" verticalAlign="bottom" align="center" />
-                      </PieChart>
+                      </RechartsPieChart>
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
@@ -483,7 +483,7 @@ export default function AnalyticsDashboardPage() {
             <section className="mb-8">
                <Card>
                   <CardHeader>
-                    <CardTitle>Conteúdo para "{activeView.replace('-', ' ')}" em breve...</CardTitle>
+                    <CardTitle className="capitalize">Conteúdo para "{activeView.replace('-', ' ')}" em breve...</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground">O conteúdo desta seção será adicionado quando implementado.</p>
@@ -497,3 +497,5 @@ export default function AnalyticsDashboardPage() {
     </SidebarProvider>
   );
 }
+
+    
