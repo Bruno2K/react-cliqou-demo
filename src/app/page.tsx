@@ -5,13 +5,13 @@ import React, { useState, useEffect, useMemo } from 'react';
 import type { LinkItem, ThemeSettings } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'; // Added DialogTitle
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { ThemeEditor } from '@/components/dashboard/theme-editor';
 import { ProfilePreview } from '@/components/dashboard/profile-preview';
 import { EditableLinkItem } from '@/components/dashboard/editable-link-item';
 import { LinkForm } from '@/components/dashboard/link-form';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { PlusCircle, Link as LinkIconLucide, Eye as EyeIcon } from '@/components/icons'; // Renamed Eye to EyeIcon to avoid conflict
+import { PlusCircle, Link as LinkIconLucide, Eye as EyeIconImport } from '@/components/icons'; // Renamed Eye to EyeIconImport
 import { useToast } from "@/hooks/use-toast";
 
 import {
@@ -147,7 +147,7 @@ export default function DashboardPage() {
           <h1 className="text-lg sm:text-xl font-bold text-primary">LinkedUp</h1>
           <div className="flex items-center gap-1 sm:gap-2">
             <Button onClick={() => setIsPreviewModalOpen(true)} className="lg:hidden" variant="outline" size="sm">
-              <EyeIcon size={16} className="mr-1 sm:mr-2" /> Preview
+              <EyeIconImport size={16} className="mr-1 sm:mr-2" /> Preview
             </Button>
             <ThemeToggle />
           </div>
@@ -161,7 +161,7 @@ export default function DashboardPage() {
             <Card className="shadow-lg">
               <CardHeader className="flex flex-col items-start gap-2 p-3 sm:p-4 sm:flex-row sm:items-center sm:justify-between">
                 <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                  <LinkIconLucide size={18} className="sm:size-20" /> 
+                  <LinkIconLucide size={16} className="sm:w-[18px] sm:h-[18px]" /> 
                   Manage Links
                 </CardTitle>
                 <Button onClick={handleOpenAddLink} size="sm" className="text-xs px-2 py-1 h-auto sm:text-sm sm:px-3 sm:py-1.5 sm:h-auto self-start sm:self-center">
@@ -217,6 +217,7 @@ export default function DashboardPage() {
       {/* Link Form Dialog */}
       <Dialog open={isLinkFormOpen} onOpenChange={setIsLinkFormOpen}>
         <DialogContent className="w-[90vw] max-w-md sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-lg">
+          <DialogTitle className="sr-only">{editingLink ? 'Edit Link' : 'Add New Link'}</DialogTitle>
           <LinkForm 
             link={editingLink} 
             onSave={handleSaveLink} 
@@ -235,3 +236,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
