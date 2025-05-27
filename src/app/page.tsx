@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -156,12 +157,12 @@ export default function DashboardPage() {
           {/* Left Panel: Editor */}
           <div className="w-full lg:w-2/5 space-y-6">
             <Card className="shadow-lg">
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <CardTitle className="flex items-center gap-2 text-xl">
                   <LinkIconLucide size={24}/>
                   Manage Links
                 </CardTitle>
-                <Button onClick={handleOpenAddLink}>
+                <Button onClick={handleOpenAddLink} className="self-start sm:self-auto">
                   <PlusCircle size={18} className="mr-2" /> Add Link
                 </Button>
               </CardHeader>
@@ -196,12 +197,12 @@ export default function DashboardPage() {
           {/* Right Panel: Preview */}
           <div className="w-full lg:w-3/5 sticky top-24 self-start">
             <Card className="shadow-lg">
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <CardTitle className="flex items-center gap-2 text-xl">
                   <Eye size={24} />
                   Live Preview
                 </CardTitle>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 self-start sm:self-auto">
                   <Button variant={activeDeviceView === 'mobile' ? 'default' : 'outline'} size="icon" onClick={() => setActiveDeviceView('mobile')} aria-label="Mobile preview"> <Smartphone /> </Button>
                   <Button variant={activeDeviceView === 'tablet' ? 'default' : 'outline'} size="icon" onClick={() => setActiveDeviceView('tablet')} aria-label="Tablet preview"> <Tablet /> </Button>
                   <Button variant={activeDeviceView === 'desktop' ? 'default' : 'outline'} size="icon" onClick={() => setActiveDeviceView('desktop')} aria-label="Desktop preview"> <Monitor /> </Button>
