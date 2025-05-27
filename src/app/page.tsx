@@ -11,9 +11,9 @@ import { ProfilePreview } from '@/components/dashboard/profile-preview';
 import { EditableLinkItem } from '@/components/dashboard/editable-link-item';
 import { LinkForm } from '@/components/dashboard/link-form';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { PlusCircle, Link as LinkIconLucide, Eye as EyeIconImport, LayoutDashboard } from '@/components/icons'; // Renamed Eye to EyeIconImport
+import { PlusCircle, Link as LinkIconLucide, Eye as EyeIconImport, LayoutDashboard } from '@/components/icons';
 import { useToast } from "@/hooks/use-toast";
-import Link from 'next/link';
+import Link from 'next/link'; // Added import for Link
 
 import {
   DndContext,
@@ -243,4 +243,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
