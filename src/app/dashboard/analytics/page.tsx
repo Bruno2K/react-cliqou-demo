@@ -135,7 +135,7 @@ export default function AnalyticsDashboardPage() {
         <SidebarFooter className="p-2">
           <SidebarMenu>
             <SidebarMenuItem>
-              <Link href="/" passHref asChild>
+              <Link href="/" asChild>
                 <SidebarMenuButton tooltip="Back to Editor">
                   <Edit3 />
                   Back to Editor
@@ -344,3 +344,4 @@ export default function AnalyticsDashboardPage() {
     </SidebarProvider>
   );
 }
+
