@@ -47,7 +47,7 @@ export const EditableLinkItem: React.FC<EditableLinkItemProps> = ({ link, onEdit
             </Button>
             
             <div className="flex-shrink-0 w-8 h-8 sm:w-9 md:w-10 sm:h-9 md:h-10 bg-muted rounded-md flex items-center justify-center">
-                <IconRenderer name={link.iconName} size={16} className="text-muted-foreground sm:size-18 md:size-20" />
+                <IconRenderer name={link.iconName} size={16} className="text-muted-foreground sm:w-[18px] sm:h-[18px] md:w-[20px] md:h-[20px]" />
             </div>
 
             <div className="flex-grow min-w-0">
