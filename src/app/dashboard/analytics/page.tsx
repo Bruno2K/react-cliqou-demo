@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AnalyticsTopbar } from '@/components/dashboard/analytics/topbar';
 import { KpiCard } from '@/components/dashboard/analytics/kpi-card';
-import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3, Filter, MoreHorizontal, ChevronDown, Radar as RadarIcon, Smartphone, MapIcon } from '@/components/icons';
+import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3, Filter, MoreHorizontal, ChevronDown, Radar as RadarIcon, Smartphone, MapIcon, MousePointerClick } from '@/components/icons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, BarChart, PieChart as RechartsPieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar as RechartsRadar } from 'recharts';
 import { Button } from '@/components/ui/button';
@@ -626,8 +626,79 @@ export default function AnalyticsDashboardPage() {
             </section>
           )}
 
+          {activeView === 'conversions' && (
+            <section id="conversions" className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">Conversões e Interações</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <TargetIcon size={20} />
+                      Taxa de Conversão por Link
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[200px] flex items-center justify-center">
+                    <div className="text-center">
+                      <TargetIcon size={40} className="mx-auto text-muted-foreground mb-2" />
+                      <p className="text-muted-foreground">Dados de taxa de conversão por link em breve.</p>
+                       <p className="text-xs text-muted-foreground mt-1">(Ex: Tabela ou gráfico de barras)</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <MousePointerClick size={20} />
+                      Interações com Botões CTA
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[200px] flex items-center justify-center">
+                     <div className="text-center">
+                      <MousePointerClick size={40} className="mx-auto text-muted-foreground mb-2" />
+                      <p className="text-muted-foreground">Contagem de interações com CTAs em breve.</p>
+                      <p className="text-xs text-muted-foreground mt-1">(Ex: Gráfico de barras por CTA)</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <ExternalLink size={20} />
+                      Cliques em Links Externos
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[200px] flex items-center justify-center">
+                     <div className="text-center">
+                      <ExternalLink size={40} className="mx-auto text-muted-foreground mb-2" />
+                      <p className="text-muted-foreground">Rastreamento de cliques em links externos em breve.</p>
+                       <p className="text-xs text-muted-foreground mt-1">(Ex: Tabela de links externos e seus cliques)</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                       <Activity size={20}/>
+                      Eventos Personalizados
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-[200px] flex items-center justify-center">
+                    <div className="text-center">
+                      <Activity size={40} className="mx-auto text-muted-foreground mb-2" />
+                      <p className="text-muted-foreground">Integração com eventos personalizados em breve.</p>
+                      <p className="text-xs text-muted-foreground mt-1">(Ex: Scroll depth, hover em elementos chave)</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+          )}
+
           {/* Placeholder for other views */}
-          {activeView !== 'overview' && activeView !== 'engagement' && activeView !== 'link-performance' && activeView !== 'devices' && activeView !== 'geolocation' && (
+          {activeView !== 'overview' && activeView !== 'engagement' && activeView !== 'link-performance' && activeView !== 'devices' && activeView !== 'geolocation' && activeView !== 'conversions' && (
             <section className="mb-8">
                <Card>
                   <CardHeader>
@@ -645,5 +716,3 @@ export default function AnalyticsDashboardPage() {
     </SidebarProvider>
   );
 }
-
-    

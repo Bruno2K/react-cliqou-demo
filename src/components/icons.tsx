@@ -72,10 +72,10 @@ export const {
   Info,
   LayoutDashboard,
   Activity,
-  PieChartIcon,
+  PieChartIcon, // Renamed from PieChart to avoid conflict
   BarChart3, 
   MapPin,
-  TargetIcon, 
+  TargetIcon, // Renamed from Target to avoid conflict or use as is
   ExternalLink,
   FileText,
   Settings2, 
@@ -85,8 +85,8 @@ export const {
   MoreHorizontal,
   Radar,
   Map: MapIcon, // For geolocation map icon
+  MousePointerClick, // Added for CTA interactions
 } = LucideIcons;
 
 // Export Image as ImageIcon separately
 export const { Image: ImageIcon } = LucideIcons;
-
