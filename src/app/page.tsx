@@ -11,8 +11,9 @@ import { ProfilePreview } from '@/components/dashboard/profile-preview';
 import { EditableLinkItem } from '@/components/dashboard/editable-link-item';
 import { LinkForm } from '@/components/dashboard/link-form';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { PlusCircle, Link as LinkIconLucide, Eye as EyeIconImport } from '@/components/icons'; // Renamed Eye to EyeIconImport
+import { PlusCircle, Link as LinkIconLucide, Eye as EyeIconImport, LayoutDashboard } from '@/components/icons'; // Renamed Eye to EyeIconImport
 import { useToast } from "@/hooks/use-toast";
+import Link from 'next/link';
 
 import {
   DndContext,
@@ -149,6 +150,12 @@ export default function DashboardPage() {
             <Button onClick={() => setIsPreviewModalOpen(true)} className="lg:hidden" variant="outline" size="sm">
               <EyeIconImport size={16} className="mr-1 sm:mr-2" /> Preview
             </Button>
+            <Link href="/dashboard/analytics" passHref>
+              <Button variant="outline" size="sm" aria-label="Analytics Dashboard">
+                <LayoutDashboard size={16} className="mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Analytics</span>
+              </Button>
+            </Link>
             <ThemeToggle />
           </div>
         </div>
