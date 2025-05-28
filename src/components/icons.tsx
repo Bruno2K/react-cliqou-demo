@@ -59,8 +59,8 @@ export const {
   ToggleRight,
   ChevronDown,
   Bell,
-  BellRing, // Added for notifications page
-  ArrowLeft, // Added for back button
+  BellRing,
+  ArrowLeft,
   CalendarDays,
   LogOut,
   AreaChart,
@@ -82,13 +82,18 @@ export const {
   FileText,
   Settings2, 
   Mail,
-  AlertCircle,
-  Filter,
+  MailOpen, // Added for mark all as read
+  EyeOff, // Added for mark as unread
+  CheckCircle, // Added for read status
+  XCircle, // Added for delete all
+  Filter: FilterIcon, // Aliased Filter to avoid conflict if any
   MoreHorizontal,
   Radar: RadarIcon, 
-  MapIcon, 
+  Map: MapIcon, 
   MousePointerClick, 
 } = LucideIcons;
 
 // Export Image as ImageIcon separately
 export const { Image: ImageIcon } = LucideIcons;
+
+    

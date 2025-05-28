@@ -1,4 +1,6 @@
 
+import type React from 'react';
+
 export interface LinkItem {
   id: string;
   title: string;
@@ -27,3 +29,18 @@ export interface ProfilePreviewProps {
   showDeviceSelector?: boolean; // If false, hides the Mobile/Tablet/Desktop toggle buttons
   onDeviceChange?: (device: 'mobile' | 'tablet' | 'desktop') => void; // Callback for when device view changes
 }
+
+// For more detailed notifications page
+export interface FullNotificationItem {
+  id: string;
+  icon: React.ReactNode; // Can be JSX element
+  title: string;
+  description: string;
+  timestamp: Date;
+  isRead: boolean;
+  category?: string; // e.g., 'reports', 'alerts', 'system', 'milestones', 'updates'
+  link?: string; // Optional link for redirection
+  // Potentially add other fields like sender, priority, etc.
+}
+
+    
