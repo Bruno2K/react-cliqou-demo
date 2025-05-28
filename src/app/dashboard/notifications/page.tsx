@@ -36,33 +36,34 @@ export default function NotificationsPage() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    setIsMounted(true); // Set mounted on client
 
     let loadedNotifications: FullNotificationItem[] = [];
-
     try {
       const storedNotificationsJSON = localStorage.getItem('linkedup-notifications');
       if (storedNotificationsJSON) {
         const parsedArray = JSON.parse(storedNotificationsJSON);
+        // Ensure it's an array and has items before proceeding
         if (Array.isArray(parsedArray) && parsedArray.length > 0) {
-          loadedNotifications = parsedArray.map((storedNotif: any) => {
+           loadedNotifications = parsedArray.map((storedNotif: any) => {
+            // Find the original mock notification to get the icon JSX
             const originalMock = initialMockNotifications.find(mock => mock.id === storedNotif.id);
-            const icon = originalMock ? originalMock.icon : <BellRing size={22} />;
+            const icon = originalMock ? originalMock.icon : <BellRing size={22} />; // Fallback icon
+
             return {
               ...storedNotif,
-              timestamp: new Date(storedNotif.timestamp),
-              icon: icon,
+              timestamp: new Date(storedNotif.timestamp), // Ensure timestamp is a Date object
+              icon: icon, // Assign the JSX icon
             };
           });
         }
-        // If storedNotificationsJSON was "[]" (empty array string), 
-        // or parsedArray was not an array, loadedNotifications remains [].
       }
     } catch (error) {
-      console.error("Error loading or processing notifications from localStorage:", error);
-      // loadedNotifications remains [] in case of error, will be handled by the check below.
+      console.error("Error loading notifications from localStorage:", error);
+      // Fallback to initial mocks if loading fails or no data
+      loadedNotifications = []; // Ensure it's empty to trigger fallback if needed
     }
-
+    
     // If, after attempting to load from localStorage, we have no notifications,
     // then re-populate with the initial mock data.
     if (loadedNotifications.length === 0) {
@@ -73,7 +74,9 @@ export default function NotificationsPage() {
     }
     
     setNotifications(loadedNotifications);
+
   }, []);
+
 
   useEffect(() => {
     if (isMounted) {
@@ -128,7 +131,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col h-screen bg-background">
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
@@ -145,9 +148,9 @@ export default function NotificationsPage() {
         </div>
       </header>
 
-      <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8">
-        <div className="w-full max-w-7xl mx-auto">
-          <Card className="shadow-xl w-full">
+      <main className="flex-1 flex flex-col min-h-0 py-6 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-7xl mx-auto flex flex-col flex-1 min-h-0">
+          <Card className="shadow-xl w-full flex flex-col flex-1 min-h-0">
             <CardHeader className="border-b">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
@@ -181,8 +184,8 @@ export default function NotificationsPage() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
+            <CardContent className="p-0 flex-1 min-h-0">
+              <div className="overflow-auto h-full">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -277,5 +280,3 @@ export default function NotificationsPage() {
     </div>
   );
 }
-
-    
