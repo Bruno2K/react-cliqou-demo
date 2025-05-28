@@ -167,9 +167,9 @@ export default function EditorDashboardPage() {
   return (
     <SidebarProvider defaultOpen>
       <Sidebar variant="sidebar" collapsible="icon" className="border-r">
-        <SidebarHeader className="p-4">
-          <Edit3 size={28} className="text-primary" />
-          <span className="text-xl font-semibold ml-2 group-data-[collapsible=icon]:hidden">LinkedUp</span>
+        <SidebarHeader className="p-2">
+          <Edit3 size={24} className="text-primary group-data-[collapsible=icon]:size-5" />
+          <span className="text-lg font-semibold ml-1.5 group-data-[collapsible=icon]:hidden">LinkedUp</span>
         </SidebarHeader>
         <SidebarContent className="p-2">
           <SidebarMenu>
