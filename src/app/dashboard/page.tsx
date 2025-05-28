@@ -4,7 +4,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import type { LinkItem, ThemeSettings } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } // Removed CardHeader, CardTitle as they are not used here
+from '@/components/ui/card';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { ThemeEditor } from '@/components/dashboard/theme-editor';
 import { ProfilePreview } from '@/components/dashboard/profile-preview';
@@ -12,9 +13,8 @@ import { EditableLinkItem } from '@/components/dashboard/editable-link-item';
 import { LinkForm } from '@/components/dashboard/link-form';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { 
-  PlusCircle, Palette, Share2, Settings, Copy, Edit, UserCircle, Link as LinkIconLucide, 
-  LogOut as LogOutIcon, LayoutDashboard, BarChart3, Users, Store, DollarSign, 
-  CalendarCheck, MessageSquareReply, Link2, HelpCircle, Megaphone, ChevronDown, AppWindow
+  PlusCircle, Palette, Share2, Settings, Copy, Edit, UserCircle, 
+  LogOut as LogOutIcon, BarChart3, HelpCircle, Megaphone, AppWindow
 } from '@/components/icons';
 import { useToast } from "@/hooks/use-toast";
 import Link from 'next/link';
@@ -38,9 +38,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
   SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/contexts/auth-context';
@@ -62,7 +59,6 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers';
-import { Input } from '@/components/ui/input';
 
 
 const initialTheme: ThemeSettings = {
@@ -178,19 +174,19 @@ export default function EditorDashboardPage() {
   
   const linkIds = useMemo(() => links.map(link => link.id), [links]);
 
-  const userProfileLink = user ? `https://linkedup.example.com/${user.name?.toLowerCase().replace(/\s+/g, '-') || 'profile'}` : 'https://linkedup.example.com/profile';
+  const userProfileLink = user ? `https://cliqou.example.com/${user.name?.toLowerCase().replace(/\s+/g, '-') || 'profile'}` : 'https://cliqou.example.com/profile';
 
   const copyLinkToClipboard = () => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(userProfileLink);
-      toast({ title: "URL Copied!", description: "Your LinkedUp URL has been copied to the clipboard." });
+      toast({ title: "URL Copied!", description: "Your Cliqou URL has been copied to the clipboard." });
     } else {
       toast({ title: "Error", description: "Could not copy URL to clipboard.", variant: "destructive" });
     }
   };
 
   if (!isMounted) {
-    return <div className="flex items-center justify-center min-h-screen bg-background"><p>Loading LinkedUp Editor...</p></div>;
+    return <div className="flex items-center justify-center min-h-screen bg-background"><p>Loading Cliqou Editor...</p></div>;
   }
 
   return (
@@ -205,86 +201,28 @@ export default function EditorDashboardPage() {
                 </Avatar>
                 <span className="text-sm font-semibold ml-1.5 group-data-[collapsible=icon]:hidden truncate" title={user?.name || "My Account"}>{user?.name || "My Account"}</span>
              </div>
-            {/* Optional: Add a chevron button here if specific dropdown functionality is needed for this header */}
-            {/* <Button variant="ghost" size="icon" className="group-data-[collapsible=icon]:hidden"> <ChevronDown size={16}/> </Button> */}
           </SidebarHeader>
           <SidebarContent className="p-2">
             <SidebarMenu>
               <SidebarMenuItem>
                 <Link href="/dashboard" passHref asChild>
-                  <SidebarMenuButton isActive={true} tooltip="My Linktree">
+                  <SidebarMenuButton isActive={true} tooltip="Cliqou editor">
                     <AppWindow />
-                    My Linktree
+                    Cliqou editor
                   </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                 <Link href="#" passHref asChild>
-                    <SidebarMenuButton tooltip="My Shop">
-                        <Store />
-                        My Shop
-                    </SidebarMenuButton>
-                 </Link>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <Link href="#" passHref asChild>
-                    <SidebarMenuButton tooltip="Earn">
-                        <DollarSign />
-                        Earn
-                    </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <Link href="#" passHref asChild>
-                    <SidebarMenuButton tooltip="Audience">
-                        <Users />
-                        Audience
-                    </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <Link href="/dashboard/analytics" passHref asChild>
-                  <SidebarMenuButton tooltip="Analytics">
+                  <SidebarMenuButton tooltip="Dashboard">
                     <BarChart3 /> 
-                    Analytics
+                    Dashboard
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
             </SidebarMenu>
-
             <SidebarSeparator className="my-3" />
-            
-            <SidebarGroup>
-                <SidebarGroupLabel className="group-data-[collapsible=icon]:sr-only px-1.5">Tools</SidebarGroupLabel>
-                <SidebarGroupContent>
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <Link href="#" passHref asChild>
-                                <SidebarMenuButton tooltip="Social planner">
-                                    <CalendarCheck />
-                                    Social planner
-                                </SidebarMenuButton>
-                            </Link>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <Link href="#" passHref asChild>
-                                <SidebarMenuButton tooltip="Instagram auto-reply">
-                                    <MessageSquareReply />
-                                    Instagram auto-reply
-                                </SidebarMenuButton>
-                            </Link>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                             <Link href="#" passHref asChild>
-                                <SidebarMenuButton tooltip="Link shortener">
-                                    <Link2 />
-                                    Link shortener
-                                </SidebarMenuButton>
-                             </Link>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                </SidebarGroupContent>
-            </SidebarGroup>
+            {/* Tools section removed */}
           </SidebarContent>
           <SidebarFooter className="p-2 mt-auto">
             <SidebarMenu>
@@ -325,7 +263,7 @@ export default function EditorDashboardPage() {
             <div className="md:hidden">
               <SidebarTrigger />
             </div>
-            <h1 className="text-lg sm:text-xl font-semibold text-foreground flex-1">My LinkedUp</h1>
+            <h1 className="text-lg sm:text-xl font-semibold text-foreground flex-1">My Cliqou</h1>
             <div className="flex items-center gap-1 sm:gap-2 ml-auto">
               <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => {}}>
                 <Palette size={16} className="mr-1 sm:mr-2"/> Design
@@ -381,7 +319,7 @@ export default function EditorDashboardPage() {
                   <Card className="shadow-sm">
                     <CardContent className="p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-2">
                       <p className="text-sm text-foreground">
-                        Your LinkedUp is live: <Link href={userProfileLink} target="_blank" className="font-medium text-primary hover:underline">{userProfileLink.replace(/^https?:\/\//, '')}</Link>
+                        Your Cliqou is live: <Link href={userProfileLink} target="_blank" className="font-medium text-primary hover:underline">{userProfileLink.replace(/^https?:\/\//, '')}</Link>
                       </p>
                       <Button variant="outline" size="sm" onClick={copyLinkToClipboard}>
                         <Copy size={14} className="mr-2" /> Copy URL
@@ -476,4 +414,3 @@ export default function EditorDashboardPage() {
     </>
   );
 }
-
