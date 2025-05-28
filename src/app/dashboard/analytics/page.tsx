@@ -264,7 +264,6 @@ export default function AnalyticsDashboardPage() {
       <SidebarInset className="flex flex-col">
         <AnalyticsTopbar
           username="Usuário Exemplo"
-          notificationCount={mockNotifications.length}
           selectedPeriod={selectedPeriod}
           onPeriodChange={handlePeriodChange}
           onLogout={() => console.log('Logout clicked')}
@@ -790,5 +789,7 @@ export default function AnalyticsDashboardPage() {
   );
 }
 
+
+    
 
     
