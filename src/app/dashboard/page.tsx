@@ -12,9 +12,9 @@ import { ProfilePreview } from '@/components/dashboard/profile-preview';
 import { EditableLinkItem } from '@/components/dashboard/editable-link-item';
 import { LinkForm } from '@/components/dashboard/link-form';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { 
-  PlusCircle, Palette, Share2, Settings, Copy, Edit, UserCircle, 
-  LogOut as LogOutIcon, BarChart3, HelpCircle, Megaphone, AppWindow
+import {
+  PlusCircle, Palette, Share2, Settings, Copy, Edit, UserCircle,
+  LogOut as LogOutIcon, BarChart3 as DashboardIcon, HelpCircle, Megaphone, AppWindow
 } from '@/components/icons';
 import { useToast } from "@/hooks/use-toast";
 import Link from 'next/link';
@@ -84,8 +84,8 @@ export default function EditorDashboardPage() {
   const [links, setLinks] = useState<LinkItem[]>([]);
   const [theme, setTheme] = useState<ThemeSettings>(initialTheme);
   const [isMounted, setIsMounted] = useState(false);
-  const [activeDeviceView, setActiveDeviceView] = useState<'mobile' | 'tablet' | 'desktop'>('desktop');
-  
+  // activeDeviceView and setActiveDeviceView removed as ProfilePreview is always mobile
+
   const [isLinkFormOpen, setIsLinkFormOpen] = useState(false);
   const [editingLink, setEditingLink] = useState<LinkItem | null>(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -98,7 +98,7 @@ export default function EditorDashboardPage() {
     const savedTheme = localStorage.getItem('linkedup-theme');
     if (savedLinks) setLinks(JSON.parse(savedLinks));
     else setLinks(initialLinks);
-    
+
     let loadedTheme = initialTheme;
     if (savedTheme) {
       loadedTheme = { ...initialTheme, ...JSON.parse(savedTheme) };
@@ -108,7 +108,7 @@ export default function EditorDashboardPage() {
       loadedTheme.profileImageUrl = savedTheme ? loadedTheme.profileImageUrl : user.profileImageUrl || initialTheme.profileImageUrl;
     }
     setTheme(loadedTheme);
-    
+
     setIsMounted(true);
   }, [user]);
 
@@ -159,19 +159,19 @@ export default function EditorDashboardPage() {
   const handleToggleActive = (id: string, isActive: boolean) => {
     setLinks(prevLinks => prevLinks.map(link => link.id === id ? { ...link, isActive } : link));
   };
-  
+
   const handleSaveLink = (linkToSave: LinkItem) => {
     if (editingLink) {
       setLinks(prevLinks => prevLinks.map(l => l.id === linkToSave.id ? linkToSave : l));
       toast({ title: "Link Updated", description: "Your link has been successfully updated." });
-    } else { 
+    } else {
       setLinks(prevLinks => [...prevLinks, { ...linkToSave, id: Date.now().toString() }]);
       toast({ title: "Link Added", description: "New link successfully created." });
     }
     setIsLinkFormOpen(false);
     setEditingLink(null);
   };
-  
+
   const linkIds = useMemo(() => links.map(link => link.id), [links]);
 
   const userProfileLink = user ? `https://cliqou.example.com/${user.name?.toLowerCase().replace(/\s+/g, '-') || 'profile'}` : 'https://cliqou.example.com/profile';
@@ -194,13 +194,13 @@ export default function EditorDashboardPage() {
       <SidebarProvider defaultOpen>
         <Sidebar variant="sidebar" collapsible="icon" className="border-r">
           <SidebarHeader className="p-2 flex items-center justify-between">
-             <div className="flex items-center overflow-hidden">
-                <Avatar className="h-7 w-7 group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5 flex-shrink-0">
-                  <AvatarImage src={user?.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar"/>
-                  <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
-                </Avatar>
-                <span className="text-sm font-semibold ml-1.5 group-data-[collapsible=icon]:hidden truncate" title={user?.name || "My Account"}>{user?.name || "My Account"}</span>
-             </div>
+            <div className="flex items-center overflow-hidden">
+              <Avatar className="h-7 w-7 group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5 flex-shrink-0">
+                <AvatarImage src={user?.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar" />
+                <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
+              </Avatar>
+              <span className="text-sm font-semibold ml-1.5 group-data-[collapsible=icon]:hidden truncate" title={user?.name || "My Account"}>{user?.name || "My Account"}</span>
+            </div>
           </SidebarHeader>
           <SidebarContent className="p-2">
             <SidebarMenu>
@@ -215,7 +215,7 @@ export default function EditorDashboardPage() {
               <SidebarMenuItem>
                 <Link href="/dashboard/analytics" passHref asChild>
                   <SidebarMenuButton tooltip="Dashboard">
-                    <BarChart3 /> 
+                    <DashboardIcon />
                     Dashboard
                   </SidebarMenuButton>
                 </Link>
@@ -226,22 +226,22 @@ export default function EditorDashboardPage() {
           </SidebarContent>
           <SidebarFooter className="p-2 mt-auto">
             <SidebarMenu>
-                <SidebarMenuItem>
-                    <Link href="#" passHref asChild>
-                        <SidebarMenuButton tooltip="Help">
-                            <HelpCircle />
-                            Help
-                        </SidebarMenuButton>
-                    </Link>
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                    <Link href="#" passHref asChild>
-                        <SidebarMenuButton tooltip="Feedback">
-                            <Megaphone />
-                            Feedback
-                        </SidebarMenuButton>
-                    </Link>
-                </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="#" passHref asChild>
+                  <SidebarMenuButton tooltip="Help">
+                    <HelpCircle />
+                    Help
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="#" passHref asChild>
+                  <SidebarMenuButton tooltip="Feedback">
+                    <Megaphone />
+                    Feedback
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton tooltip="Settings" onClick={() => document.getElementById('user-avatar-dropdown-trigger')?.click()}>
                   <Settings />
@@ -263,49 +263,49 @@ export default function EditorDashboardPage() {
             <div className="md:hidden">
               <SidebarTrigger />
             </div>
-            <h1 className="text-lg sm:text-xl font-semibold text-foreground flex-1">My Cliqou</h1>
+            <h1 className="text-lg sm:text-xl font-semibold text-foreground flex-1">My LinkedUp</h1>
             <div className="flex items-center gap-1 sm:gap-2 ml-auto">
-              <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => {}}>
-                <Palette size={16} className="mr-1 sm:mr-2"/> Design
+              <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => { /* TODO: Open ThemeEditor or design modal */ }}>
+                <Palette size={16} className="mr-1 sm:mr-2" /> Design
               </Button>
-               <Button variant="outline" size="icon" className="sm:hidden" onClick={() => {}}>
-                <Palette size={16}/>
+              <Button variant="outline" size="icon" className="sm:hidden" onClick={() => { /* TODO: Open ThemeEditor or design modal */ }}>
+                <Palette size={16} />
                 <span className="sr-only">Design</span>
               </Button>
-              <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => {}}>
-                <Share2 size={16} className="mr-1 sm:mr-2"/> Share
+              <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => { /* TODO: Implement share functionality */ }}>
+                <Share2 size={16} className="mr-1 sm:mr-2" /> Share
               </Button>
-               <Button variant="outline" size="icon" className="sm:hidden" onClick={() => {}}>
-                <Share2 size={16}/>
-                 <span className="sr-only">Share</span>
+              <Button variant="outline" size="icon" className="sm:hidden" onClick={() => { /* TODO: Implement share functionality */ }}>
+                <Share2 size={16} />
+                <span className="sr-only">Share</span>
               </Button>
               <ThemeToggle />
-               <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" id="user-avatar-dropdown-trigger" className="relative h-8 w-8 rounded-full p-0 sm:h-9 sm:w-9 md:h-10 md:w-10">
-                      <Settings size={18} className="sm:size-5"/>
-                      <span className="sr-only">Settings</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {user?.email || "user@example.com"}
-                        </p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                    <DropdownMenuItem>Settings</DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout} className="text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-900/50 focus:text-red-700 dark:focus:text-red-300">
-                      <LogOutIcon size={16} className="mr-2" />
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" id="user-avatar-dropdown-trigger" className="relative h-8 w-8 rounded-full p-0 sm:h-9 sm:w-9 md:h-10 md:w-10">
+                    <Settings size={18} className="sm:size-5" />
+                    <span className="sr-only">Settings</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {user?.email || "user@example.com"}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} className="text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-900/50 focus:text-red-700 dark:focus:text-red-300">
+                    <LogOutIcon size={16} className="mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </header>
 
@@ -314,12 +314,12 @@ export default function EditorDashboardPage() {
               <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
                 {/* Left Panel: Editor */}
                 <div className="w-full lg:flex-[3] xl:flex-[2] space-y-4 sm:space-y-6">
-                  
+
                   {/* Live Bar */}
                   <Card className="shadow-sm">
                     <CardContent className="p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-2">
                       <p className="text-sm text-foreground">
-                        Your Cliqou is live: <Link href={userProfileLink} target="_blank" className="font-medium text-primary hover:underline">{userProfileLink.replace(/^https?:\/\//, '')}</Link>
+                        Your LinkedUp is live: <Link href={userProfileLink} target="_blank" className="font-medium text-primary hover:underline">{userProfileLink.replace(/^https?:\/\//, '')}</Link>
                       </p>
                       <Button variant="outline" size="sm" onClick={copyLinkToClipboard}>
                         <Copy size={14} className="mr-2" /> Copy URL
@@ -330,19 +330,19 @@ export default function EditorDashboardPage() {
                   {/* Profile Section */}
                   <div className="flex flex-col items-center text-center p-4">
                     <Avatar className="w-24 h-24 mb-3 border-2 border-border">
-                       <AvatarImage src={theme.profileImageUrl || `https://placehold.co/100x100.png?text=${theme.username?.charAt(0) || 'A'}`} alt={theme.username || "User"} data-ai-hint="user avatar"/>
-                       <AvatarFallback>{theme.username?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
+                      <AvatarImage src={theme.profileImageUrl || `https://placehold.co/100x100.png?text=${theme.username?.charAt(0) || 'A'}`} alt={theme.username || "User"} data-ai-hint="user avatar" />
+                      <AvatarFallback>{theme.username?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
                     </Avatar>
                     <h2 className="text-xl font-semibold text-foreground">@{theme.username || user?.name || "username"}</h2>
-                    <Button variant="link" size="sm" className="text-primary mt-1" onClick={() => {/* TODO: Implement Add/Edit Bio Modal or inline editing */}}>
+                    <Button variant="link" size="sm" className="text-primary mt-1" onClick={() => { /* TODO: Implement Add/Edit Bio Modal or inline editing */ }}>
                       <Edit size={14} className="mr-1" /> {theme.bio ? "Edit Bio" : "Add Bio"}
                     </Button>
                   </div>
-                  
+
                   {/* Add Link Button */}
-                  <Button 
-                    onClick={handleOpenAddLink} 
-                    size="lg" 
+                  <Button
+                    onClick={handleOpenAddLink}
+                    size="lg"
                     className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-md"
                   >
                     <PlusCircle size={20} className="mr-2" /> Add Link
@@ -373,18 +373,15 @@ export default function EditorDashboardPage() {
                       </DndContext>
                     )}
                   </div>
-                  
+
                   <ThemeEditor theme={theme} onThemeChange={handleThemeChange} />
                 </div>
 
                 {/* Right Panel: Preview (Desktop) */}
                 <div className="hidden lg:block lg:flex-[2] xl:flex-[1] sticky top-[calc(5rem+1rem)] self-start"> {/* Adjusted sticky top for header */}
-                  <ProfilePreview 
-                    links={links} 
-                    theme={theme} 
-                    activeDeviceView={activeDeviceView} 
-                    showDeviceSelector={true} 
-                    onDeviceChange={setActiveDeviceView} 
+                  <ProfilePreview
+                    links={links}
+                    theme={theme}
                   />
                 </div>
               </div>
@@ -396,19 +393,20 @@ export default function EditorDashboardPage() {
         <Dialog open={isLinkFormOpen} onOpenChange={setIsLinkFormOpen}>
           <DialogContent className="w-[90vw] max-w-md sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-lg">
             <DialogTitle className="sr-only">{editingLink ? 'Edit Link' : 'Add New Link'}</DialogTitle>
-            <LinkForm 
-              link={editingLink} 
-              onSave={handleSaveLink} 
-              onClose={() => { setIsLinkFormOpen(false); setEditingLink(null); }} 
+            <LinkForm
+              link={editingLink}
+              onSave={handleSaveLink}
+              onClose={() => { setIsLinkFormOpen(false); setEditingLink(null); }}
             />
           </DialogContent>
         </Dialog>
-        
+
+        {/* Mobile Preview Modal - Button removed from header, this modal trigger needs to be re-added if needed */}
         <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
-           <DialogContent className="p-0 w-auto h-auto bg-transparent border-none shadow-none data-[state=open]:zoom-in-90 sm:rounded-lg">
-             <DialogTitle className="sr-only">Profile Page Preview</DialogTitle>
-             <ProfilePreview links={links} theme={theme} activeDeviceView="mobile" showDeviceSelector={false} />
-           </DialogContent>
+          <DialogContent className="p-0 w-auto h-auto bg-transparent border-none shadow-none data-[state=open]:zoom-in-90 sm:rounded-lg flex items-center justify-center">
+            <DialogTitle className="sr-only">Profile Page Preview</DialogTitle>
+            <ProfilePreview links={links} theme={theme} />
+          </DialogContent>
         </Dialog>
       </SidebarProvider>
     </>

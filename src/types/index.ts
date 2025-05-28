@@ -25,9 +25,9 @@ export interface ThemeSettings {
 export interface ProfilePreviewProps {
   links: LinkItem[];
   theme: ThemeSettings;
-  activeDeviceView?: 'mobile' | 'tablet' | 'desktop';
-  showDeviceSelector?: boolean; // If false, hides the Mobile/Tablet/Desktop toggle buttons
-  onDeviceChange?: (device: 'mobile' | 'tablet' | 'desktop') => void; // Callback for when device view changes
+  // activeDeviceView?: 'mobile' | 'tablet' | 'desktop'; // Removed
+  // showDeviceSelector?: boolean; // Removed
+  // onDeviceChange?: (device: 'mobile' | 'tablet' | 'desktop') => void; // Removed
 }
 
 // For more detailed notifications page
