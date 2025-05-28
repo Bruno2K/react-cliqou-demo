@@ -2,7 +2,7 @@
 // src/components/dashboard/notifications/notification-detail-modal.tsx
 "use client";
 
-import React from 'react'; // Added import for React
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,7 +18,7 @@ import type { FullNotificationItem } from '@/types';
 import { cn } from '@/lib/utils';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { BellRing, Trash2, Eye, EyeOff, ExternalLink, X } from '@/components/icons'; // Added X for close button
+import { BellRing, Trash2, Eye, EyeOff, ExternalLink, X } from '@/components/icons';
 
 interface NotificationDetailModalProps {
   isOpen: boolean;
@@ -79,18 +79,19 @@ export const NotificationDetailModal: React.FC<NotificationDetailModalProps> = (
           </DialogDescription>
         </ScrollArea>
         
-        <DialogFooter className="mt-auto pt-4 border-t sm:justify-between gap-2 flex-wrap">
-          <div className="flex gap-2 flex-wrap justify-start">
-            <Button variant="outline" onClick={handleToggleRead} size="sm">
+        <DialogFooter className="mt-auto pt-4 border-t flex flex-col-reverse gap-y-2 sm:flex-row sm:justify-between">
+          {/* Group for main action buttons. On mobile, they appear below "Fechar" due to flex-col-reverse on parent */}
+          <div className="flex flex-col-reverse gap-y-2 sm:flex-row sm:gap-x-2">
+            <Button variant="outline" onClick={handleToggleRead} size="sm" className="w-full sm:w-auto">
               {notification.isRead ? <EyeOff size={16} className="mr-2" /> : <Eye size={16} className="mr-2" />}
               {notification.isRead ? 'Marcar como Não Lida' : 'Marcar como Lida'}
             </Button>
-            <Button variant="destructive" onClick={handleDelete} size="sm">
+            <Button variant="destructive" onClick={handleDelete} size="sm" className="w-full sm:w-auto">
               <Trash2 size={16} className="mr-2" />
               Excluir
             </Button>
             {notification.link && (
-              <Button variant="secondary" size="sm" asChild>
+              <Button variant="secondary" size="sm" asChild className="w-full sm:w-auto">
                 <a href={notification.link} target="_blank" rel="noopener noreferrer">
                   <ExternalLink size={16} className="mr-2" />
                   Ir para Link
@@ -98,12 +99,12 @@ export const NotificationDetailModal: React.FC<NotificationDetailModalProps> = (
               </Button>
             )}
           </div>
+          {/* Close button. On mobile, it appears at the top due to flex-col-reverse on parent */}
           <DialogClose asChild>
-            <Button variant="ghost" size="sm">Fechar</Button>
+            <Button variant="ghost" size="sm" className="w-full sm:w-auto">Fechar</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 };
-
