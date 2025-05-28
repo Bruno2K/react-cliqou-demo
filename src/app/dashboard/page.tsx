@@ -11,7 +11,7 @@ import { ProfilePreview } from '@/components/dashboard/profile-preview';
 import { EditableLinkItem } from '@/components/dashboard/editable-link-item';
 import { LinkForm } from '@/components/dashboard/link-form';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { ProfilePictureModal } from '@/components/dashboard/profile-picture-modal'; // Added
+import { ProfilePictureModal } from '@/components/dashboard/profile-picture-modal';
 import {
   PlusCircle, Palette, Share2, Settings, Copy, Edit, UserCircle,
   LogOut as LogOutIcon, DashboardIcon, HelpCircle, Megaphone, AppWindow, Edit2
@@ -88,7 +88,7 @@ export default function EditorDashboardPage() {
   const [isLinkFormOpen, setIsLinkFormOpen] = useState(false);
   const [editingLink, setEditingLink] = useState<LinkItem | null>(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
-  const [isProfilePicModalOpen, setIsProfilePicModalOpen] = useState(false); // New state
+  const [isProfilePicModalOpen, setIsProfilePicModalOpen] = useState(false);
 
   const { toast } = useToast();
   const { user, logout } = useAuth();
@@ -105,7 +105,6 @@ export default function EditorDashboardPage() {
     }
     if (user) {
       loadedTheme.username = savedTheme ? loadedTheme.username : user.name || initialTheme.username;
-      // Prioritize saved theme image, then auth user image, then initial theme image
       loadedTheme.profileImageUrl = savedTheme 
                                       ? loadedTheme.profileImageUrl 
                                       : (user.profileImageUrl || initialTheme.profileImageUrl);
@@ -274,17 +273,17 @@ export default function EditorDashboardPage() {
             </div>
             <h1 className="text-lg sm:text-xl font-semibold text-foreground flex-1">My LinkedUp</h1>
             <div className="flex items-center gap-1 sm:gap-2 ml-auto">
-              <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => { /* TODO: Open ThemeEditor or design modal */ }}>
+              <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => {}}>
                 <Palette size={16} className="mr-1 sm:mr-2"/> Design
               </Button>
-               <Button variant="outline" size="icon" className="sm:hidden" onClick={() => {/* TODO: Open ThemeEditor or design modal */} }}>
+               <Button variant="outline" size="icon" className="sm:hidden" onClick={() => {}}>
                 <Palette size={16}/>
                 <span className="sr-only">Design</span>
               </Button>
-              <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => { /* TODO: Implement share functionality */ }}>
+              <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => {}}>
                 <Share2 size={16} className="mr-1 sm:mr-2"/> Share
               </Button>
-              <Button variant="outline" size="icon" className="sm:hidden" onClick={() => {/* TODO: Implement share functionality */} }}>
+              <Button variant="outline" size="icon" className="sm:hidden" onClick={() => {}}>
                 <Share2 size={16}/>
                 <span className="sr-only">Share</span>
               </Button>
@@ -398,7 +397,7 @@ export default function EditorDashboardPage() {
                 </div>
 
                 {/* Right Panel: Preview (Desktop) */}
-                <div className="hidden lg:block lg:flex-[2] xl:flex-[1] sticky top-[calc(5rem+1rem)] self-start"> {/* Adjusted sticky top for header */}
+                <div className="hidden lg:block lg:flex-[2] xl:flex-[1] sticky top-[calc(5rem+1rem)] self-start">
                   <ProfilePreview
                     links={links}
                     theme={theme}
