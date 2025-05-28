@@ -36,43 +36,45 @@ export default function NotificationsPage() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    // Set isMounted to true once the component mounts on the client-side.
+    // This helps avoid hydration issues and ensures localStorage is accessed only on the client.
+    setIsMounted(true);
+
+    let finalNotifications: FullNotificationItem[] = [...initialMockNotifications]; // Default to a copy of mock
+
     try {
       const storedNotificationsJSON = localStorage.getItem('linkedup-notifications');
       if (storedNotificationsJSON) {
-        const parsedNotifications = JSON.parse(storedNotificationsJSON, function(this: FullNotificationItem, key: string, value: any) {
-          if (key === 'timestamp' && typeof value === 'string') {
-            return new Date(value);
-          }
-          // When parsing, `this` refers to the object being built.
-          // The `icon` itself won't be in the JSON (it's JSX), so we need to find the original mock.
-          if (key === 'icon') {
-             const notificationId = this.id; // `this` is the current notification object being parsed
-             if (notificationId) {
-                const originalMockItem = initialMockNotifications.find(item => item.id === notificationId);
-                if (originalMockItem && originalMockItem.icon) {
-                    return originalMockItem.icon; // Return the JSX icon from the initial mock
-                }
-             }
-             return value; // Should be null or undefined if not found, or if it was somehow stored
-          }
-          return value;
-        });
-        setNotifications(parsedNotifications);
-      } else {
-        setNotifications(initialMockNotifications);
+        const parsedArray = JSON.parse(storedNotificationsJSON);
+        
+        if (Array.isArray(parsedArray)) {
+          // Map over the parsed array to restore icons and ensure timestamps are Date objects
+          finalNotifications = parsedArray.map((storedNotif: any) => {
+            // Find the original mock notification to get the icon
+            const originalMock = initialMockNotifications.find(mock => mock.id === storedNotif.id);
+            const icon = originalMock ? originalMock.icon : <BellRing size={22} />; // Fallback icon
+
+            return {
+              ...storedNotif,
+              timestamp: new Date(storedNotif.timestamp), // Ensure timestamp is a Date object
+              icon: icon, // Restore icon
+            };
+          });
+        }
       }
     } catch (error) {
-      console.error("Error loading or parsing notifications from localStorage:", error);
-      setNotifications(initialMockNotifications); // Fallback to initial mock if error
+      console.error("Error processing notifications from localStorage:", error);
+      // If error, finalNotifications remains a copy of initialMockNotifications
+      // To ensure a fresh start if parsing fails badly, you could also set it to a fresh copy:
+      finalNotifications = [...initialMockNotifications];
     }
-    setIsMounted(true);
-  }, []);
+    setNotifications(finalNotifications);
+  }, []); // Empty dependency array, runs once on mount client-side
 
   useEffect(() => {
     if (isMounted) {
-      // When saving, convert JSX icon to null or a placeholder string if needed,
-      // as JSX cannot be directly stringified. For this example, we'll let it be,
-      // and the reviver will restore it from the initialMockNotifications.
+      // When saving, JSX for icons won't be stringified well.
+      // The loading effect above handles re-assigning icons from initialMockNotifications.
       localStorage.setItem('linkedup-notifications', JSON.stringify(notifications));
     }
   }, [notifications, isMounted]);
@@ -122,7 +124,7 @@ export default function NotificationsPage() {
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
-            <Link href="/dashboard/analytics" passHref>
+            <Link href="/dashboard/analytics">
               <Button variant="outline" size="icon" aria-label="Voltar para Analytics">
                 <ArrowLeft size={20} />
               </Button>
