@@ -43,4 +43,8 @@ export interface FullNotificationItem {
   // Potentially add other fields like sender, priority, etc.
 }
 
-    
+export interface User {
+  email: string;
+  name?: string;
+  // id?: string; // if you have a user ID
+}

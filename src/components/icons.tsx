@@ -63,6 +63,8 @@ export const {
   ArrowLeft,
   CalendarDays,
   LogOut,
+  LogIn, // Added LogIn
+  Loader2, // Added Loader2
   AreaChart,
   Users,
   Percent,
@@ -95,13 +97,8 @@ export const {
   MessageSquare,
   ShoppingCart,
   Search,
-  X, // Added X icon
+  X,
 } = LucideIcons;
 
 // Export Image as ImageIcon separately
 export const { Image: ImageIcon } = LucideIcons;
-
-    
-
-    
-
