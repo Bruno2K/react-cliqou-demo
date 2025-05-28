@@ -131,13 +131,6 @@ const externalLinkClicksData = [
   { id: 'ext4', name: 'Canal YouTube', clicks: 650 },
 ];
 
-const getActiveDeviceViewHelper = () => {
-    if (typeof window !== 'undefined') {
-        return window.innerWidth < 768 ? 'mobile' : 'desktop';
-    }
-    return 'desktop';
-};
-
 type ActiveView = 'overview' | 'engagement' | 'link-performance' | 'devices' | 'geolocation' | 'conversions';
 
 
@@ -145,7 +138,6 @@ export default function AnalyticsDashboardPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>(undefined);
   const [activeView, setActiveView] = useState<ActiveView>('overview');
-  const [activePieChartSizeView, setActivePieChartSizeView] = useState<'mobile' | 'desktop'>('desktop');
 
   const [statusFilter, setStatusFilter] = useState<Record<LinkPerformanceItem['status'], boolean>>({ active: true, inactive: true });
   const [performanceFilter, setPerformanceFilter] = useState<string>('all');
@@ -172,17 +164,6 @@ export default function AnalyticsDashboardPage() {
     // Add performance filter logic here when implemented
     return isStatusMatch;
   });
-
-
-  useEffect(() => {
-    const handleResize = () => {
-      setActivePieChartSizeView(getActiveDeviceViewHelper());
-    };
-    handleResize(); // Set initial value
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
 
   return (
     <SidebarProvider defaultOpen>
@@ -382,7 +363,7 @@ export default function AnalyticsDashboardPage() {
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          outerRadius={Math.min(typeof window !== 'undefined' ? window.innerWidth : 300, typeof window !== 'undefined' ? window.innerHeight : 300) / (activePieChartSizeView === 'mobile' ? 7 : 9)}
+                          outerRadius="80%"
                           fill="#8884d8"
                           dataKey="value"
                           label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
@@ -541,7 +522,7 @@ export default function AnalyticsDashboardPage() {
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          outerRadius={Math.min(typeof window !== 'undefined' ? window.innerWidth : 300, typeof window !== 'undefined' ? window.innerHeight : 300) / (activePieChartSizeView === 'mobile' ? 7 : 9)}
+                          outerRadius="80%"
                           fill="#8884d8"
                           dataKey="value"
                           label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
@@ -788,8 +769,3 @@ export default function AnalyticsDashboardPage() {
     </SidebarProvider>
   );
 }
-
-
-    
-
-    
