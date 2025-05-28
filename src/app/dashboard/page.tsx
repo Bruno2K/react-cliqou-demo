@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react'; // Explicitly import React
+import React, { useState, useEffect, useMemo } from 'react';
 import type { LinkItem, ThemeSettings } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +11,11 @@ import { ProfilePreview } from '@/components/dashboard/profile-preview';
 import { EditableLinkItem } from '@/components/dashboard/editable-link-item';
 import { LinkForm } from '@/components/dashboard/link-form';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { PlusCircle, Palette, Share2, Settings, Copy, Edit, UserCircle, Link as LinkIconLucide, PieChartIcon, BellRing as NotificationsIcon, LogOut as LogOutIcon, Edit3 as EditorIcon } from '@/components/icons';
+import { 
+  PlusCircle, Palette, Share2, Settings, Copy, Edit, UserCircle, Link as LinkIconLucide, 
+  LogOut as LogOutIcon, LayoutDashboard, BarChart3, Users, Store, DollarSign, 
+  CalendarCheck, MessageSquareReply, Link2, HelpCircle, Megaphone, ChevronDown, AppWindow
+} from '@/components/icons';
 import { useToast } from "@/hooks/use-toast";
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -34,6 +38,10 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/contexts/auth-context';
 
@@ -84,7 +92,7 @@ export default function EditorDashboardPage() {
   
   const [isLinkFormOpen, setIsLinkFormOpen] = useState(false);
   const [editingLink, setEditingLink] = useState<LinkItem | null>(null);
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // For mobile preview
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   const { toast } = useToast();
   const { user, logout } = useAuth();
@@ -189,43 +197,115 @@ export default function EditorDashboardPage() {
     <>
       <SidebarProvider defaultOpen>
         <Sidebar variant="sidebar" collapsible="icon" className="border-r">
-          <SidebarHeader className="p-2">
-             <Avatar className="h-7 w-7 group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5">
-               <AvatarImage src={user?.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar" />
-               <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
-             </Avatar>
-            <span className="text-sm font-semibold ml-1.5 group-data-[collapsible=icon]:hidden">{user?.name || "My Account"}</span>
+          <SidebarHeader className="p-2 flex items-center justify-between">
+             <div className="flex items-center overflow-hidden">
+                <Avatar className="h-7 w-7 group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5 flex-shrink-0">
+                  <AvatarImage src={user?.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar"/>
+                  <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-semibold ml-1.5 group-data-[collapsible=icon]:hidden truncate" title={user?.name || "My Account"}>{user?.name || "My Account"}</span>
+             </div>
+            {/* Optional: Add a chevron button here if specific dropdown functionality is needed for this header */}
+            {/* <Button variant="ghost" size="icon" className="group-data-[collapsible=icon]:hidden"> <ChevronDown size={16}/> </Button> */}
           </SidebarHeader>
           <SidebarContent className="p-2">
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton isActive={true} tooltip="Editor">
-                  <EditorIcon />
-                  Editor
-                </SidebarMenuButton>
+                <Link href="/dashboard" passHref asChild>
+                  <SidebarMenuButton isActive={true} tooltip="My Linktree">
+                    <AppWindow />
+                    My Linktree
+                  </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <Link href="/dashboard/analytics">
+                 <Link href="#" passHref asChild>
+                    <SidebarMenuButton tooltip="My Shop">
+                        <Store />
+                        My Shop
+                    </SidebarMenuButton>
+                 </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="#" passHref asChild>
+                    <SidebarMenuButton tooltip="Earn">
+                        <DollarSign />
+                        Earn
+                    </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="#" passHref asChild>
+                    <SidebarMenuButton tooltip="Audience">
+                        <Users />
+                        Audience
+                    </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="/dashboard/analytics" passHref asChild>
                   <SidebarMenuButton tooltip="Analytics">
-                    <PieChartIcon /> 
+                    <BarChart3 /> 
                     Analytics
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <Link href="/dashboard/notifications">
-                  <SidebarMenuButton tooltip="Notifications">
-                    <NotificationsIcon />
-                    Notifications
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
             </SidebarMenu>
+
+            <SidebarSeparator className="my-3" />
+            
+            <SidebarGroup>
+                <SidebarGroupLabel className="group-data-[collapsible=icon]:sr-only px-1.5">Tools</SidebarGroupLabel>
+                <SidebarGroupContent>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <Link href="#" passHref asChild>
+                                <SidebarMenuButton tooltip="Social planner">
+                                    <CalendarCheck />
+                                    Social planner
+                                </SidebarMenuButton>
+                            </Link>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <Link href="#" passHref asChild>
+                                <SidebarMenuButton tooltip="Instagram auto-reply">
+                                    <MessageSquareReply />
+                                    Instagram auto-reply
+                                </SidebarMenuButton>
+                            </Link>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                             <Link href="#" passHref asChild>
+                                <SidebarMenuButton tooltip="Link shortener">
+                                    <Link2 />
+                                    Link shortener
+                                </SidebarMenuButton>
+                             </Link>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarGroupContent>
+            </SidebarGroup>
           </SidebarContent>
-          <SidebarFooter className="p-2">
+          <SidebarFooter className="p-2 mt-auto">
             <SidebarMenu>
+                <SidebarMenuItem>
+                    <Link href="#" passHref asChild>
+                        <SidebarMenuButton tooltip="Help">
+                            <HelpCircle />
+                            Help
+                        </SidebarMenuButton>
+                    </Link>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                    <Link href="#" passHref asChild>
+                        <SidebarMenuButton tooltip="Feedback">
+                            <Megaphone />
+                            Feedback
+                        </SidebarMenuButton>
+                    </Link>
+                </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton tooltip="Settings (User Dropdown)" onClick={() => document.getElementById('user-avatar-dropdown-trigger')?.click()}>
+                <SidebarMenuButton tooltip="Settings" onClick={() => document.getElementById('user-avatar-dropdown-trigger')?.click()}>
                   <Settings />
                   Settings
                 </SidebarMenuButton>
@@ -312,7 +392,7 @@ export default function EditorDashboardPage() {
                   {/* Profile Section */}
                   <div className="flex flex-col items-center text-center p-4">
                     <Avatar className="w-24 h-24 mb-3 border-2 border-border">
-                       <AvatarImage src={theme.profileImageUrl || `https://placehold.co/100x100.png?text=${theme.username?.charAt(0) || 'A'}`} alt={theme.username || "User"} data-ai-hint="user avatar" />
+                       <AvatarImage src={theme.profileImageUrl || `https://placehold.co/100x100.png?text=${theme.username?.charAt(0) || 'A'}`} alt={theme.username || "User"} data-ai-hint="user avatar"/>
                        <AvatarFallback>{theme.username?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
                     </Avatar>
                     <h2 className="text-xl font-semibold text-foreground">@{theme.username || user?.name || "username"}</h2>
@@ -361,17 +441,13 @@ export default function EditorDashboardPage() {
 
                 {/* Right Panel: Preview (Desktop) */}
                 <div className="hidden lg:block lg:flex-[2] xl:flex-[1] sticky top-[calc(5rem+1rem)] self-start"> {/* Adjusted sticky top for header */}
-                  <Card className="shadow-lg">
-                    <CardContent className={activeDeviceView !== 'desktop' ? 'flex justify-center items-start p-2 sm:p-4 overflow-auto' : 'p-0'}>
-                       <ProfilePreview 
-                          links={links} 
-                          theme={theme} 
-                          activeDeviceView={activeDeviceView} 
-                          showDeviceSelector={true} 
-                          onDeviceChange={setActiveDeviceView} 
-                       />
-                    </CardContent>
-                  </Card>
+                  <ProfilePreview 
+                    links={links} 
+                    theme={theme} 
+                    activeDeviceView={activeDeviceView} 
+                    showDeviceSelector={true} 
+                    onDeviceChange={setActiveDeviceView} 
+                  />
                 </div>
               </div>
             </div>
@@ -389,16 +465,13 @@ export default function EditorDashboardPage() {
             />
           </DialogContent>
         </Dialog>
-
-        {/* Preview Modal (Mobile/Tablet) - This is not needed as per new design where mobile has no dedicated preview button */}
-        {/* 
+        
         <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
            <DialogContent className="p-0 w-auto h-auto bg-transparent border-none shadow-none data-[state=open]:zoom-in-90 sm:rounded-lg">
              <DialogTitle className="sr-only">Profile Page Preview</DialogTitle>
              <ProfilePreview links={links} theme={theme} activeDeviceView="mobile" showDeviceSelector={false} />
            </DialogContent>
         </Dialog>
-        */}
       </SidebarProvider>
     </>
   );

@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import type { DateRange } from "react-day-picker"; // Import DateRange
+import type { DateRange } from "react-day-picker";
 import {
   SidebarProvider,
   Sidebar,
@@ -15,10 +15,20 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { AnalyticsTopbar } from '@/components/dashboard/analytics/topbar';
 import { KpiCard } from '@/components/dashboard/analytics/kpi-card';
-import { AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3, FilterIcon, MoreHorizontal, ChevronDown, RadarIcon, Smartphone, MapIcon, MousePointerClick } from '@/components/icons';
+import { 
+  AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, 
+  AlertCircle, FileText, Settings, LogOut, LayoutDashboard, PieChartIcon, Activity, 
+  MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3, FilterIcon, MoreHorizontal, 
+  ChevronDown, RadarIcon, Smartphone, MapIcon, MousePointerClick, Store, DollarSign,
+  CalendarCheck, MessageSquareReply, Link2, HelpCircle, Megaphone, AppWindow
+} from '@/components/icons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, BarChart, PieChart as RechartsPieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar as RechartsRadar } from 'recharts';
 import { Button } from '@/components/ui/button';
@@ -42,6 +52,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { UserCircle } from '@/components/icons';
+
 
 // Mock Data
 const kpiData = [
@@ -132,7 +145,7 @@ const externalLinkClicksData = [
   { id: 'ext4', name: 'Canal YouTube', clicks: 650 },
 ];
 
-type ActiveView = 'overview' | 'engagement' | 'link-performance' | 'devices' | 'geolocation' | 'conversions';
+type ActiveView = 'overview' | 'engagement' | 'link-performance' | 'devices' | 'geolocation' | 'conversions' | 'shop' | 'earn' | 'audience' | 'social-planner' | 'instagram-auto-reply' | 'link-shortener';
 
 
 export default function AnalyticsDashboardPage() {
@@ -163,6 +176,20 @@ export default function AnalyticsDashboardPage() {
     const isStatusMatch = (statusFilter.active && link.status === 'active') || (statusFilter.inactive && link.status === 'inactive');
     return isStatusMatch;
   });
+  
+  const commonPlaceholder = (viewName: string) => (
+    <section className="mb-8">
+      <Card>
+        <CardHeader>
+          <CardTitle className="capitalize">Conteúdo para "{viewName.replace(/-/g, ' ')}" em breve...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">O conteúdo desta seção será adicionado quando implementado.</p>
+        </CardContent>
+      </Card>
+    </section>
+  );
+
 
   return (
     <SidebarProvider defaultOpen>
@@ -171,59 +198,92 @@ export default function AnalyticsDashboardPage() {
         collapsible="icon"
         className="border-r"
       >
-        <SidebarHeader className="p-2">
-          <LayoutDashboard size={24} className="text-primary group-data-[collapsible=icon]:size-5" />
-          <span className="text-lg font-semibold ml-1.5 group-data-[collapsible=icon]:hidden">Analytics</span>
-        </SidebarHeader>
+        <SidebarHeader className="p-2 flex items-center justify-between">
+             <div className="flex items-center overflow-hidden">
+                <Avatar className="h-7 w-7 group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5 flex-shrink-0">
+                  <AvatarImage src={user?.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar" />
+                  <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-semibold ml-1.5 group-data-[collapsible=icon]:hidden truncate" title={user?.name || "My Account"}>{user?.name || "My Account"}</span>
+             </div>
+          </SidebarHeader>
         <SidebarContent className="p-2">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton isActive={activeView === 'overview'} onClick={() => setActiveView('overview')} tooltip="Visão Geral">
-                <LayoutDashboard />
-                Visão Geral
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton isActive={activeView === 'engagement'} onClick={() => setActiveView('engagement')} tooltip="Engajamento">
-                <Activity />
-                Engajamento
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton isActive={activeView === 'link-performance'} onClick={() => setActiveView('link-performance')} tooltip="Desempenho por Link">
-                <LinkIcon />
-                Desempenho por Link
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton isActive={activeView === 'devices'} onClick={() => setActiveView('devices')} tooltip="Dispositivos">
-                <PieChartIcon />
-                Dispositivos
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton isActive={activeView === 'geolocation'} onClick={() => setActiveView('geolocation')} tooltip="Geolocalização">
-                <MapPin />
-                Geolocalização
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-             <SidebarMenuItem>
-              <SidebarMenuButton isActive={activeView === 'conversions'} onClick={() => setActiveView('conversions')} tooltip="Conversões">
-                <TargetIcon />
-                Conversões
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarContent>
-        <SidebarFooter className="p-2">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <Link href="/dashboard">
-                <SidebarMenuButton tooltip="Back to Editor">
-                  <Edit3 />
-                  Back to Editor
+              <Link href="/dashboard" passHref asChild>
+                <SidebarMenuButton isActive={activeView === 'overview' && false} tooltip="My Linktree"> {/* Ensure Analytics is not active here */}
+                  <AppWindow />
+                  My Linktree
                 </SidebarMenuButton>
               </Link>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+                <SidebarMenuButton isActive={activeView === 'shop'} onClick={() => setActiveView('shop')} tooltip="My Shop">
+                    <Store />
+                    My Shop
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton isActive={activeView === 'earn'} onClick={() => setActiveView('earn')} tooltip="Earn">
+                    <DollarSign />
+                    Earn
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton isActive={activeView === 'audience'} onClick={() => setActiveView('audience')} tooltip="Audience">
+                    <Users />
+                    Audience
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton isActive={activeView === 'analytics'} onClick={() => setActiveView('overview')} tooltip="Analytics" className={activeView.startsWith('overview') || activeView.startsWith('engagement') || activeView.startsWith('link-performance') || activeView.startsWith('devices') || activeView.startsWith('geolocation') || activeView.startsWith('conversions') ? 'bg-sidebar-accent text-sidebar-accent-foreground' : ''}>
+                    <BarChart3 />
+                    Analytics
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+          
+          <SidebarSeparator className="my-3" />
+            
+          <SidebarGroup>
+            <SidebarGroupLabel className="group-data-[collapsible=icon]:sr-only px-1.5">Tools</SidebarGroupLabel>
+            <SidebarGroupContent>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton isActive={activeView === 'social-planner'} onClick={() => setActiveView('social-planner')} tooltip="Social planner">
+                            <CalendarCheck />
+                            Social planner
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton isActive={activeView === 'instagram-auto-reply'} onClick={() => setActiveView('instagram-auto-reply')} tooltip="Instagram auto-reply">
+                            <MessageSquareReply />
+                            Instagram auto-reply
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton isActive={activeView === 'link-shortener'} onClick={() => setActiveView('link-shortener')} tooltip="Link shortener">
+                            <Link2 />
+                            Link shortener
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooter className="p-2 mt-auto">
+          <SidebarMenu>
+             <SidebarMenuItem>
+                <SidebarMenuButton href="#" tooltip="Help">
+                    <HelpCircle />
+                    Help
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton href="#" tooltip="Feedback">
+                    <Megaphone />
+                    Feedback
+                </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
               <SidebarMenuButton tooltip="Configurações">
@@ -267,16 +327,7 @@ export default function AnalyticsDashboardPage() {
                   ))}
                 </div>
               </section>
-              <section className="mb-8">
-                 <Card>
-                    <CardHeader>
-                      <CardTitle>Mais Seções em Breve...</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">Outras seções como Desempenho por Link, Geolocalização, etc., serão adicionadas aqui quando selecionadas na sidebar.</p>
-                    </CardContent>
-                 </Card>
-              </section>
+              {/* Nested Menu for Analytics subsections - this part is removed for the new structure */}
             </>
           )}
 
@@ -747,23 +798,19 @@ export default function AnalyticsDashboardPage() {
               </div>
             </section>
           )}
+          
+          {/* Placeholders for other new views */}
+          {(activeView === 'shop' || 
+            activeView === 'earn' || 
+            activeView === 'audience' || 
+            activeView === 'social-planner' || 
+            activeView === 'instagram-auto-reply' || 
+            activeView === 'link-shortener') && commonPlaceholder(activeView)}
 
-          {/* Placeholder for other views */}
-          {activeView !== 'overview' && activeView !== 'engagement' && activeView !== 'link-performance' && activeView !== 'devices' && activeView !== 'geolocation' && activeView !== 'conversions' && (
-            <section className="mb-8">
-               <Card>
-                  <CardHeader>
-                    <CardTitle className="capitalize">Conteúdo para "{activeView.replace(/-/g, ' ')}" em breve...</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">O conteúdo desta seção será adicionado quando implementado.</p>
-                  </CardContent>
-               </Card>
-            </section>
-          )}
 
         </main>
       </SidebarInset>
     </SidebarProvider>
   );
 }
+

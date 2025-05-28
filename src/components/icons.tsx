@@ -66,7 +66,7 @@ export const {
   LogIn, 
   Loader2, 
   AreaChart,
-  Users,
+  Users, // Also for Audience
   Percent,
   Clock,
   TrendingUp,
@@ -75,10 +75,10 @@ export const {
   ArrowDownRight,
   Info,
   AlertCircle,
-  LayoutDashboard,
+  LayoutDashboard, // For My Linktree (Editor) main icon in sidebar
   Activity,
   PieChartIcon, 
-  BarChart3, 
+  BarChart3, // For Analytics
   MapPin,
   TargetIcon, 
   ExternalLink,
@@ -100,9 +100,18 @@ export const {
   X,
   KeyRound, 
   MailCheck, 
-  Copy, // Added Copy
-  Edit, // Added Edit (distinct from Edit3)
-  Share2, // Added Share2 for Share functionality
+  Copy,
+  Edit, 
+  Share2,
+  Store, // For My Shop
+  DollarSign, // For Earn
+  LayoutGrid, // Alternative for My Linktree if LayoutDashboard is used elsewhere
+  AppWindow, // Alternative for My Linktree
+  CalendarCheck, // For Social planner
+  MessageSquareReply, // For Instagram auto-reply
+  Link2, // For Link shortener
+  HelpCircle, // For Help
+  Megaphone // For Feedback/Announcements
 } = LucideIcons;
 
 // Export Image as ImageIcon separately
@@ -110,3 +119,4 @@ export const { Image: ImageIcon } = LucideIcons;
 
 // Export Edit3 as EditorIcon for clarity if needed elsewhere, Edit3 is already exported
 export const { Edit3: EditorIcon } = LucideIcons;
+
