@@ -50,7 +50,7 @@ export default function NotificationsPage() {
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true); // Indicate client-side mount is complete
+    setIsMounted(true); 
     let loadedNotifications: FullNotificationItem[] = [];
     try {
       const storedNotificationsJSON = localStorage.getItem('linkedup-notifications');
@@ -58,12 +58,13 @@ export default function NotificationsPage() {
         const parsedArray = JSON.parse(storedNotificationsJSON);
         if (Array.isArray(parsedArray)) {
           loadedNotifications = parsedArray.map((storedNotif: any) => {
+            // Find the corresponding mock notification to get the icon
             const originalMock = initialMockNotifications.find(mock => mock.id === storedNotif.id);
-            const icon = originalMock ? originalMock.icon : <BellRing size={22} />;
+            const icon = originalMock ? originalMock.icon : <BellRing size={22} />; // Fallback icon
             return {
               ...storedNotif,
-              timestamp: new Date(storedNotif.timestamp),
-              icon: icon,
+              timestamp: new Date(storedNotif.timestamp), // Ensure timestamp is a Date object
+              icon: icon, // Assign the icon JSX
             };
           });
         }
@@ -71,7 +72,6 @@ export default function NotificationsPage() {
     } catch (error) {
       console.error("Error loading notifications from localStorage:", error);
       // Fallback to empty if error, will be handled below
-      loadedNotifications = [];
     }
     
     // If no notifications were loaded (e.g., first visit, error, or localStorage cleared/empty array), use initial mocks
@@ -87,6 +87,7 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (isMounted) {
+      // Strip out icon before saving to localStorage as JSX is not serializable
       const notificationsToSave = notifications.map(notif => {
         const { icon, ...rest } = notif;
         return rest;
@@ -361,3 +362,5 @@ export default function NotificationsPage() {
     </div>
   );
 }
+
+    
