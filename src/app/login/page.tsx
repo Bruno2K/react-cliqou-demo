@@ -22,7 +22,7 @@ export default function LoginPage() {
  useEffect(() => {
     // If user is already authenticated and not loading, redirect from login page
     if (!isLoading && isAuthenticated) {
-      router.push('/');
+      router.push('/dashboard');
     }
   }, [isLoading, isAuthenticated, router]);
 

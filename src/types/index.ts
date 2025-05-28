@@ -46,5 +46,6 @@ export interface FullNotificationItem {
 export interface User {
   email: string;
   name?: string;
+  profileImageUrl?: string; // Added for avatar in topbar
   // id?: string; // if you have a user ID
 }

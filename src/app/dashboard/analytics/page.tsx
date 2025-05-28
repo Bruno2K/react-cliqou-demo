@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/contexts/auth-context'; // Import useAuth
+import { useAuth } from '@/contexts/auth-context';
 
 // Mock Data
 const kpiData = [
@@ -142,18 +142,16 @@ export default function AnalyticsDashboardPage() {
 
   const [statusFilter, setStatusFilter] = useState<Record<LinkPerformanceItem['status'], boolean>>({ active: true, inactive: true });
   const [performanceFilter, setPerformanceFilter] = useState<string>('all');
-  const { user, logout } = useAuth(); // Get user and logout from context
+  const { user, logout } = useAuth();
 
   const handlePeriodChange = (period: string, dateRange?: DateRange) => {
     setSelectedPeriod(period);
     if (period === 'custom' && dateRange) {
       setCustomDateRange(dateRange);
       console.log("Custom date range selected:", dateRange);
-      // Here you would typically re-fetch data based on the new period/dateRange
     } else if (period !== 'custom') {
       setCustomDateRange(undefined);
       console.log("Selected period:", period);
-      // Re-fetch data for standard period
     }
   };
 
@@ -163,7 +161,6 @@ export default function AnalyticsDashboardPage() {
 
   const filteredLinkPerformanceData = linkPerformanceData.filter(link => {
     const isStatusMatch = (statusFilter.active && link.status === 'active') || (statusFilter.inactive && link.status === 'inactive');
-    // Add performance filter logic here when implemented
     return isStatusMatch;
   });
 
@@ -221,7 +218,7 @@ export default function AnalyticsDashboardPage() {
         <SidebarFooter className="p-2">
           <SidebarMenu>
             <SidebarMenuItem>
-              <Link href="/">
+              <Link href="/dashboard">
                 <SidebarMenuButton tooltip="Back to Editor">
                   <Edit3 />
                   Back to Editor

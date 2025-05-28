@@ -2,7 +2,7 @@
 'use client';
 
 import type { User } from '@/types';
-import { useRouter, usePathname } from 'next/navigation'; // Added usePathname
+import { useRouter, usePathname } from 'next/navigation';
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 interface AuthContextType {
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const pathname = usePathname(); // Get current pathname
+  const pathname = usePathname();
 
   useEffect(() => {
     try {
@@ -40,7 +40,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (email: string) => {
-    const mockUser: User = { email, name: email.split('@')[0] || 'User' };
+    // In a real app, you'd fetch the full user profile here
+    const mockUser: User = { 
+        email, 
+        name: email.split('@')[0] || 'User',
+        profileImageUrl: `https://placehold.co/80x80.png?text=${(email.split('@')[0] || 'U').charAt(0).toUpperCase()}` // Mock profile image
+    };
     setUser(mockUser);
     setIsAuthenticated(true);
     try {
@@ -48,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Error saving auth to localStorage:", error);
     }
-    router.push('/');
+    router.push('/dashboard'); // Redirect to the new dashboard/editor page
   };
 
   const logout = () => {
@@ -60,7 +65,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error("Error removing auth from localStorage:", error);
     }
     // Only redirect to /login if not already on a public page or login page itself
-    if (pathname !== '/login') { // Check current path
+    // This also handles cases where logout might be triggered from a non-dashboard page.
+    if (pathname !== '/login' && pathname !== '/forgot-password') { 
         router.push('/login');
     }
   };
