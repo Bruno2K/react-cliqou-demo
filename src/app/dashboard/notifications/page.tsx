@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowLeft, BellRing, FileText, AlertCircle, Info, Users, Settings, CheckCircle, XCircle, Eye, EyeOff, Trash2, Mail, MailOpen, Filter as FilterIcon, MoreHorizontal } from '@/components/icons';
+import { ArrowLeft, BellRing, FileText, AlertCircle, Info, Users, Settings, CheckCircle, XCircle, Eye, EyeOff, Trash2, Mail, MailOpen, FilterIcon, MoreHorizontal } from '@/components/icons';
 import type { FullNotificationItem } from '@/types';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -32,17 +32,36 @@ export default function NotificationsPage() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Simulate fetching notifications
-    const storedNotifications = localStorage.getItem('linkedup-notifications');
-    if (storedNotifications) {
-      setNotifications(JSON.parse(storedNotifications, (key, value) => {
-        if (key === 'timestamp') return new Date(value);
-        // For icon, we need to re-map it based on category or title as JSX cannot be stored directly
-        // For simplicity in this example, we'll re-assign icons based on original mock data structure if id matches
-        const originalNotif = initialMockNotifications.find(n => n.id === (JSON.parse(storedNotifications).find((sn: FullNotificationItem) => sn.id === value.id)?.id));
-        if (key === 'icon' && originalNotif) return originalNotif.icon;
-        return value;
-      }));
+    const storedNotificationsJSON = localStorage.getItem('linkedup-notifications');
+    if (storedNotificationsJSON) {
+      try {
+        const parsedNotifications = JSON.parse(storedNotificationsJSON, function(this: FullNotificationItem, key: string, value: any) {
+          if (key === 'timestamp' && typeof value === 'string') {
+            return new Date(value);
+          }
+          if (key === 'icon') {
+            // 'this' refers to the notification object being revived.
+            // 'this.id' is the ID of the current notification object.
+            const notificationId = this.id;
+            if (notificationId) {
+              const originalMockItem = initialMockNotifications.find(item => item.id === notificationId);
+              if (originalMockItem && originalMockItem.icon) {
+                // Return the JSX icon from the initial mock data
+                return originalMockItem.icon;
+              }
+            }
+            // Fallback to the stored value (likely null or undefined if icon couldn't be stringified/restored)
+            // or return a default placeholder icon if needed.
+            return value; 
+          }
+          return value;
+        });
+        setNotifications(parsedNotifications);
+      } catch (error) {
+        console.error("Error parsing notifications from localStorage:", error);
+        // Fallback to initial mock notifications if parsing fails
+        setNotifications(initialMockNotifications);
+      }
     } else {
       setNotifications(initialMockNotifications);
     }
@@ -51,6 +70,8 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (isMounted) {
+      // When saving to localStorage, JSX for icons will become null or {}
+      // The reviver in the loading useEffect handles restoring them.
       localStorage.setItem('linkedup-notifications', JSON.stringify(notifications));
     }
   }, [notifications, isMounted]);
@@ -173,7 +194,7 @@ export default function NotificationsPage() {
                         </TableCell>
                         <TableCell className="text-center hidden sm:table-cell">
                           <div className="flex justify-center items-center h-full">
-                            {React.cloneElement(notif.icon as React.ReactElement, { size: 22 })}
+                            {notif.icon ? React.cloneElement(notif.icon as React.ReactElement, { size: 22 }) : <BellRing size={22}/>}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -243,5 +264,6 @@ export default function NotificationsPage() {
     </div>
   );
 }
-
       
+
+    
