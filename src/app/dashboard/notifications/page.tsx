@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowLeft, BellRing, FileText, AlertCircle, Info, Users, Settings, CheckCircle, XCircle, Eye, EyeOff, Trash2, Mail, MailOpen, FilterIcon, MoreHorizontal } from '@/components/icons';
+import { ArrowLeft, BellRing, FileText, AlertCircle, Info, Users, Settings, CheckCircle, XCircle, Eye, EyeOff, Trash2, Mail, MailOpen, FilterIcon, MoreHorizontal, Award, MessageSquare, ShoppingCart, TrendingUp } from '@/components/icons';
 import type { FullNotificationItem } from '@/types';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -19,10 +19,14 @@ import { cn } from '@/lib/utils';
 const initialMockNotifications: FullNotificationItem[] = [
   { id: 'notif1', icon: <FileText size={20} className="text-blue-500" />, title: 'Relatório Semanal Gerado', description: 'Seu relatório de performance da semana passada já está disponível para visualização.', timestamp: new Date(Date.now() - 1000 * 60 * 5), isRead: false, category: 'reports', link: '/dashboard/analytics?section=reports' },
   { id: 'notif2', icon: <AlertCircle size={20} className="text-red-500" />, title: 'Alerta: CTR Baixo', description: 'A taxa de cliques (CTR) da campanha "Promoção de Verão" caiu 15% nas últimas 24 horas.', timestamp: new Date(Date.now() - 1000 * 60 * 60), isRead: false, category: 'alerts' },
-  { id: 'notif3', icon: <Info size={20} className="text-yellow-500" />, title: 'Manutenção Programada', description: 'Haverá uma manutenção programada no sistema hoje, das 23:00 às 00:00. Algumas funcionalidades podem ficar indisponíveis.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3), isRead: true, category: 'system' },
+  { id: 'notif3', icon: <Info size={20} className="text-yellow-500" />, title: 'Manutenção Programada', description: 'Haverá uma manutenção programada no sistema hoje, das 23:00 às 00:00.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3), isRead: true, category: 'system' },
   { id: 'notif4', icon: <Users size={20} className="text-green-500" />, title: 'Marco Atingido: 10.000 Usuários!', description: 'Parabéns! Sua plataforma atingiu a marca de 10.000 usuários únicos cadastrados.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), isRead: true, category: 'milestones' },
   { id: 'notif5', icon: <Settings size={20} className="text-gray-500" />, title: 'Atualização de Política de Privacidade', description: 'Nossa política de privacidade foi atualizada. Revise os novos termos.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48), isRead: false, category: 'updates' },
-  { id: 'notif6', icon: <FileText size={20} className="text-blue-500" />, title: 'Relatório Mensal (Maio) Disponível', description: 'O relatório consolidado do mês de Maio está pronto.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), isRead: true, category: 'reports' },
+  { id: 'notif6', icon: <Award size={20} className="text-purple-500" />, title: 'Você ganhou um novo Badge!', description: 'Por sua atividade recente, você desbloqueou o badge "Mestre dos Links".', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 72), isRead: false, category: 'achievements' },
+  { id: 'notif7', icon: <MessageSquare size={20} className="text-cyan-500" />, title: 'Nova Mensagem de Suporte', description: 'A equipe de suporte respondeu à sua solicitação #12345.', timestamp: new Date(Date.now() - 1000 * 60 * 30), isRead: false, category: 'support' },
+  { id: 'notif8', icon: <ShoppingCart size={20} className="text-orange-500" />, title: 'Seu Pedido Foi Enviado', description: 'O pedido #S9876 referente ao plano premium foi processado e enviado.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6), isRead: true, category: 'billing' },
+  { id: 'notif9', icon: <TrendingUp size={20} className="text-lime-500" />, title: 'Dica de Performance', description: 'Notamos que o link "Meu Ebook Gratuito" tem alta visualização mas baixa conversão. Considere revisar o CTA.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), isRead: true, category: 'tips' },
+  { id: 'notif10', icon: <FileText size={20} className="text-blue-500" />, title: 'Relatório Mensal (Maio) Disponível', description: 'O relatório consolidado do mês de Maio está pronto.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), isRead: true, category: 'reports' },
 ];
 
 
@@ -39,15 +43,17 @@ export default function NotificationsPage() {
           if (key === 'timestamp' && typeof value === 'string') {
             return new Date(value);
           }
+          // When parsing, `this` refers to the object being built.
+          // The `icon` itself won't be in the JSON (it's JSX), so we need to find the original mock.
           if (key === 'icon') {
-            const notificationId = this.id; 
-            if (notificationId) {
-              const originalMockItem = initialMockNotifications.find(item => item.id === notificationId);
-              if (originalMockItem && originalMockItem.icon) {
-                return originalMockItem.icon;
-              }
-            }
-            return value; 
+             const notificationId = this.id; // `this` is the current notification object being parsed
+             if (notificationId) {
+                const originalMockItem = initialMockNotifications.find(item => item.id === notificationId);
+                if (originalMockItem && originalMockItem.icon) {
+                    return originalMockItem.icon; // Return the JSX icon from the initial mock
+                }
+             }
+             return value; // Should be null or undefined if not found, or if it was somehow stored
           }
           return value;
         });
@@ -64,6 +70,9 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (isMounted) {
+      // When saving, convert JSX icon to null or a placeholder string if needed,
+      // as JSX cannot be directly stringified. For this example, we'll let it be,
+      // and the reviver will restore it from the initialMockNotifications.
       localStorage.setItem('linkedup-notifications', JSON.stringify(notifications));
     }
   }, [notifications, isMounted]);
@@ -258,3 +267,5 @@ export default function NotificationsPage() {
     </div>
   );
 }
+
+    

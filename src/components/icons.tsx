@@ -72,7 +72,7 @@ export const {
   ArrowUpRight,
   ArrowDownRight,
   Info,
-  AlertCircle, // Added AlertCircle here
+  AlertCircle,
   LayoutDashboard,
   Activity,
   PieChartIcon, 
@@ -81,7 +81,6 @@ export const {
   TargetIcon, 
   ExternalLink,
   FileText,
-  Settings2, 
   Mail,
   MailOpen,
   EyeOff,
@@ -90,11 +89,16 @@ export const {
   Filter: FilterIcon,
   MoreHorizontal,
   Radar: RadarIcon, 
-  Map: MapIcon, 
-  MousePointerClick, 
+  MapIcon, 
+  MousePointerClick,
+  Award,
+  MessageSquare,
+  ShoppingCart,
 } = LucideIcons;
 
 // Export Image as ImageIcon separately
 export const { Image: ImageIcon } = LucideIcons;
+
+    
 
     
