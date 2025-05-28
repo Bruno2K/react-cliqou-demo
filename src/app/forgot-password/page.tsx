@@ -24,8 +24,8 @@ export default function ForgotPasswordPage() {
       return;
     }
     setIsSubmitting(true);
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Simulate API call delay - REMOVED for faster response
+    // await new Promise(resolve => setTimeout(resolve, 1000));
 
     // In a real app, you would call an API to send a reset link.
     // For this demo, we'll just show a success message.
