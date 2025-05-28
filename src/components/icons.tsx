@@ -72,6 +72,7 @@ export const {
   ArrowUpRight,
   ArrowDownRight,
   Info,
+  AlertCircle, // Added AlertCircle here
   LayoutDashboard,
   Activity,
   PieChartIcon, 
@@ -82,11 +83,11 @@ export const {
   FileText,
   Settings2, 
   Mail,
-  MailOpen, // Added for mark all as read
-  EyeOff, // Added for mark as unread
-  CheckCircle, // Added for read status
-  XCircle, // Added for delete all
-  Filter: FilterIcon, // Aliased Filter to avoid conflict if any
+  MailOpen,
+  EyeOff,
+  CheckCircle,
+  XCircle,
+  Filter: FilterIcon,
   MoreHorizontal,
   Radar: RadarIcon, 
   Map: MapIcon, 
