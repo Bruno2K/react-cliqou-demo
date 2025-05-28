@@ -59,17 +59,19 @@ export const {
   ToggleRight,
   ChevronDown,
   Bell,
+  BellRing, // Added for notifications page
+  ArrowLeft, // Added for back button
   CalendarDays,
   LogOut,
   AreaChart,
-  Users, // Already exported, used in mock notifications
+  Users,
   Percent,
   Clock,
   TrendingUp,
   TrendingDown,
   ArrowUpRight,
   ArrowDownRight,
-  Info, // Already exported, used in mock notifications
+  Info,
   LayoutDashboard,
   Activity,
   PieChartIcon, 
@@ -77,17 +79,16 @@ export const {
   MapPin,
   TargetIcon, 
   ExternalLink,
-  FileText, // Already exported, used in mock notifications
+  FileText,
   Settings2, 
   Mail,
-  AlertCircle, // Already exported, used in mock notifications
+  AlertCircle,
   Filter,
   MoreHorizontal,
   Radar: RadarIcon, 
-  Map: MapIcon, 
+  MapIcon, 
   MousePointerClick, 
 } = LucideIcons;
 
 // Export Image as ImageIcon separately
 export const { Image: ImageIcon } = LucideIcons;
-

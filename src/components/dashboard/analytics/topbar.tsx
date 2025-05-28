@@ -2,9 +2,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link'; // Added Link import
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Bell, CalendarDays, LogOut, ChevronDown, Info, AlertCircle, FileText, Users } from '@/components/icons'; // Added Users
+import { Bell, CalendarDays, LogOut, ChevronDown, Info, AlertCircle, FileText, Users } from '@/components/icons';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import {
   DropdownMenu,
@@ -26,7 +27,6 @@ import { cn } from '@/lib/utils';
 
 interface AnalyticsTopbarProps {
   username: string;
-  notificationCount?: number;
   selectedPeriod: string;
   onPeriodChange: (period: string, dateRange?: DateRange) => void;
   onLogout: () => void;
@@ -52,7 +52,6 @@ const mockNotifications = [
 
 export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
   username,
-  notificationCount = 0, // Default to 0 if not provided
   selectedPeriod,
   onPeriodChange,
   onLogout,
@@ -71,9 +70,11 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
   const handlePeriodSelect = (value: string) => {
     if (value === 'custom') {
       onPeriodChange(value);
+      // setIsDatePopoverOpen(true); // Open calendar popover when 'custom' is selected
     } else {
       onPeriodChange(value);
       setDateRange(undefined);
+      setIsDatePopoverOpen(false);
     }
   };
 
@@ -82,20 +83,24 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
     if (dateRange?.from && dateRange?.to) {
       onPeriodChange('custom', dateRange);
     } else if (dateRange?.from && !dateRange?.to) {
+      // If only 'from' is selected, treat 'to' as the same date
       onPeriodChange('custom', { from: dateRange.from, to: dateRange.from });
     }
   };
   
   const getPeriodLabel = () => {
-    if (selectedPeriod === 'custom' && dateRange?.from && dateRange?.to) {
-      return `${format(dateRange.from, "dd/MM/yy")} - ${format(dateRange.to, "dd/MM/yy")}`;
+    if (selectedPeriod === 'custom' && dateRange?.from) {
+      if (dateRange.to && dateRange.from?.getTime() !== dateRange.to?.getTime()) {
+        return `${format(dateRange.from, "dd/MM/yy")} - ${format(dateRange.to, "dd/MM/yy")}`;
+      }
+      return format(dateRange.from, "dd/MM/yy");
     }
     return periodOptions.find(p => p.value === selectedPeriod)?.label || 'Selecionar Período';
   };
 
   const getDateRangeButtonLabel = () => {
     if (dateRange?.from) {
-      if (dateRange.to) {
+      if (dateRange.to && dateRange.from?.getTime() !== dateRange.to?.getTime()) {
         return `${format(dateRange.from, "dd/MM/yy")} - ${format(dateRange.to, "dd/MM/yy")}`;
       }
       return format(dateRange.from, "dd/MM/yy");
@@ -103,7 +108,7 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
     return "Selecionar Datas";
   };
 
-  const displayedNotificationCount = currentNotifications.length > 0 ? currentNotifications.length : notificationCount;
+  const displayedNotificationCount = currentNotifications.length;
 
 
   return (
@@ -120,9 +125,9 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="flex items-center gap-1.5 text-xs sm:text-sm min-w-[120px] justify-between">
-              <CalendarDays size={14} className="sm:size-16" />
+              <CalendarDays size={14} className="sm:size-4" /> {/* Corrected size */}
               <span className="truncate">{getPeriodLabel()}</span>
-              <ChevronDown size={14} className="opacity-70 sm:size-16" />
+              <ChevronDown size={14} className="opacity-70 sm:size-4" /> {/* Corrected size */}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -140,9 +145,9 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
           <Popover open={isDatePopoverOpen} onOpenChange={setIsDatePopoverOpen}>
             <PopoverTrigger asChild>
               <Button variant="outline" className="flex items-center gap-1.5 text-xs sm:text-sm min-w-[150px] justify-between">
-                <CalendarDays size={14} className="text-muted-foreground sm:size-16" /> 
+                <CalendarDays size={14} className="text-muted-foreground sm:size-4" /> {/* Corrected size */}
                 <span className="truncate">{getDateRangeButtonLabel()}</span>
-                 <ChevronDown size={14} className="opacity-70 sm:size-16" />
+                 <ChevronDown size={14} className="opacity-70 sm:size-4" /> {/* Corrected size */}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="end">
@@ -157,7 +162,7 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
               />
               <div className="p-2 border-t flex justify-end gap-2">
                 <Button variant="ghost" size="sm" onClick={() => setIsDatePopoverOpen(false)}>Cancelar</Button>
-                <Button size="sm" onClick={handleDateRangeApply} disabled={!dateRange?.from}>Aplicar</Button> {/* Allow applying with only one date or ensure both selected */}
+                <Button size="sm" onClick={handleDateRangeApply} disabled={!dateRange?.from}>Aplicar</Button>
               </div>
             </PopoverContent>
           </Popover>
@@ -166,7 +171,7 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative rounded-full h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10">
-              <Bell size={18} className="sm:size-20" />
+              <Bell size={18} className="sm:size-5" /> {/* Corrected size */}
               {displayedNotificationCount > 0 && (
                 <span className="absolute top-1 right-1 flex h-2 w-2.5 sm:h-2.5 sm:w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -201,8 +206,10 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
               </DropdownMenuItem>
             )}
              <DropdownMenuSeparator />
-             <DropdownMenuItem className="justify-center text-sm text-primary hover:underline">
-                Ver todas as notificações
+             <DropdownMenuItem asChild className="justify-center text-sm text-primary hover:underline cursor-pointer">
+                <Link href="/dashboard/notifications">
+                    Ver todas as notificações
+                </Link>
              </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -239,4 +246,3 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
     </header>
   );
 };
-
