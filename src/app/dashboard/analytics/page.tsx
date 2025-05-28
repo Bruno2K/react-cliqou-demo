@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/auth-context'; // Import useAuth
 
 // Mock Data
 const kpiData = [
@@ -141,6 +142,7 @@ export default function AnalyticsDashboardPage() {
 
   const [statusFilter, setStatusFilter] = useState<Record<LinkPerformanceItem['status'], boolean>>({ active: true, inactive: true });
   const [performanceFilter, setPerformanceFilter] = useState<string>('all');
+  const { user, logout } = useAuth(); // Get user and logout from context
 
   const handlePeriodChange = (period: string, dateRange?: DateRange) => {
     setSelectedPeriod(period);
@@ -233,7 +235,7 @@ export default function AnalyticsDashboardPage() {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Sair">
+              <SidebarMenuButton tooltip="Sair" onClick={logout}>
                 <LogOut />
                 Sair
               </SidebarMenuButton>
@@ -244,10 +246,9 @@ export default function AnalyticsDashboardPage() {
 
       <SidebarInset className="flex flex-col">
         <AnalyticsTopbar
-          username="Usuário Exemplo"
+          username={user?.name || "Usuário"}
           selectedPeriod={selectedPeriod}
           onPeriodChange={handlePeriodChange}
-          onLogout={() => console.log('Logout clicked')}
         />
 
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-muted/30">

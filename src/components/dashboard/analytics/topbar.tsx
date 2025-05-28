@@ -24,12 +24,13 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import type { DateRange } from "react-day-picker";
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/auth-context'; // Import useAuth
 
 interface AnalyticsTopbarProps {
   username: string;
   selectedPeriod: string;
   onPeriodChange: (period: string, dateRange?: DateRange) => void;
-  onLogout: () => void;
+  // onLogout prop is no longer needed as we'll use the context
   className?: string;
 }
 
@@ -54,12 +55,12 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
   username,
   selectedPeriod,
   onPeriodChange,
-  onLogout,
   className,
 }) => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false);
   const [currentNotifications, setCurrentNotifications] = useState(mockNotifications);
+  const { logout } = useAuth(); // Get logout function from context
 
   useEffect(() => {
     if (selectedPeriod !== 'custom' && dateRange) {
@@ -125,9 +126,9 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="flex items-center gap-1.5 text-xs sm:text-sm min-w-[120px] justify-between">
-              <CalendarDays size={14} className="sm:size-4" /> {/* Corrected size */}
+              <CalendarDays size={14} className="sm:size-4" />
               <span className="truncate">{getPeriodLabel()}</span>
-              <ChevronDown size={14} className="opacity-70 sm:size-4" /> {/* Corrected size */}
+              <ChevronDown size={14} className="opacity-70 sm:size-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -145,9 +146,9 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
           <Popover open={isDatePopoverOpen} onOpenChange={setIsDatePopoverOpen}>
             <PopoverTrigger asChild>
               <Button variant="outline" className="flex items-center gap-1.5 text-xs sm:text-sm min-w-[150px] justify-between">
-                <CalendarDays size={14} className="text-muted-foreground sm:size-4" /> {/* Corrected size */}
+                <CalendarDays size={14} className="text-muted-foreground sm:size-4" />
                 <span className="truncate">{getDateRangeButtonLabel()}</span>
-                 <ChevronDown size={14} className="opacity-70 sm:size-4" /> {/* Corrected size */}
+                 <ChevronDown size={14} className="opacity-70 sm:size-4" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="end">
@@ -171,7 +172,7 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative rounded-full h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10">
-              <Bell size={18} className="sm:size-5" /> {/* Corrected size */}
+              <Bell size={18} className="sm:size-5" />
               {displayedNotificationCount > 0 && (
                 <span className="absolute top-1 right-1 flex h-2 w-2.5 sm:h-2.5 sm:w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -236,7 +237,7 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
             <DropdownMenuItem>Perfil</DropdownMenuItem>
             <DropdownMenuItem>Configurações</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={onLogout} className="text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-900/50 focus:text-red-700 dark:focus:text-red-300">
+            <DropdownMenuItem onClick={logout} className="text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-900/50 focus:text-red-700 dark:focus:text-red-300">
               <LogOut size={16} className="mr-2" />
               Sair
             </DropdownMenuItem>
