@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react'; // Explicitly import React
 import type { LinkItem, ThemeSettings } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -99,7 +99,6 @@ export default function EditorDashboardPage() {
     if (savedTheme) {
       loadedTheme = { ...initialTheme, ...JSON.parse(savedTheme) };
     }
-    // Update theme with user data if available and not already set by savedTheme
     if (user) {
       loadedTheme.username = savedTheme ? loadedTheme.username : user.name || initialTheme.username;
       loadedTheme.profileImageUrl = savedTheme ? loadedTheme.profileImageUrl : user.profileImageUrl || initialTheme.profileImageUrl;
@@ -107,7 +106,7 @@ export default function EditorDashboardPage() {
     setTheme(loadedTheme);
     
     setIsMounted(true);
-  }, [user]); // Add user to dependency array to update theme when user loads
+  }, [user]);
 
   useEffect(() => {
     if (isMounted) {
@@ -171,11 +170,15 @@ export default function EditorDashboardPage() {
   
   const linkIds = useMemo(() => links.map(link => link.id), [links]);
 
-  const userProfileLink = user ? `linkedup.example/${user.name?.toLowerCase().replace(/\s+/g, '-') || 'profile'}` : 'linkedup.example/profile';
+  const userProfileLink = user ? `https://linkedup.example.com/${user.name?.toLowerCase().replace(/\s+/g, '-') || 'profile'}` : 'https://linkedup.example.com/profile';
 
   const copyLinkToClipboard = () => {
-    navigator.clipboard.writeText(`https://${userProfileLink}`);
-    toast({ title: "URL Copied!", description: "Your LinkedUp URL has been copied to the clipboard." });
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(userProfileLink);
+      toast({ title: "URL Copied!", description: "Your LinkedUp URL has been copied to the clipboard." });
+    } else {
+      toast({ title: "Error", description: "Could not copy URL to clipboard.", variant: "destructive" });
+    }
   };
 
   if (!isMounted) {
@@ -183,228 +186,221 @@ export default function EditorDashboardPage() {
   }
 
   return (
-    <SidebarProvider defaultOpen>
-      <Sidebar variant="sidebar" collapsible="icon" className="border-r">
-        <SidebarHeader className="p-2">
-           <Avatar className="h-7 w-7 group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5">
-             <AvatarImage src={user?.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar" />
-             <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
-           </Avatar>
-          <span className="text-sm font-semibold ml-1.5 group-data-[collapsible=icon]:hidden">{user?.name || "My Account"}</span>
-        </SidebarHeader>
-        <SidebarContent className="p-2">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton isActive={true} tooltip="Editor">
-                <EditorIcon />
-                Editor
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <Link href="/dashboard/analytics">
-                <SidebarMenuButton tooltip="Analytics">
-                  <PieChartIcon /> 
-                  Analytics
+    <>
+      <SidebarProvider defaultOpen>
+        <Sidebar variant="sidebar" collapsible="icon" className="border-r">
+          <SidebarHeader className="p-2">
+             <Avatar className="h-7 w-7 group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5">
+               <AvatarImage src={user?.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar" />
+               <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
+             </Avatar>
+            <span className="text-sm font-semibold ml-1.5 group-data-[collapsible=icon]:hidden">{user?.name || "My Account"}</span>
+          </SidebarHeader>
+          <SidebarContent className="p-2">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton isActive={true} tooltip="Editor">
+                  <EditorIcon />
+                  Editor
                 </SidebarMenuButton>
-              </Link>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <Link href="/dashboard/notifications">
-                <SidebarMenuButton tooltip="Notifications">
-                  <NotificationsIcon />
-                  Notifications
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="/dashboard/analytics">
+                  <SidebarMenuButton tooltip="Analytics">
+                    <PieChartIcon /> 
+                    Analytics
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link href="/dashboard/notifications">
+                  <SidebarMenuButton tooltip="Notifications">
+                    <NotificationsIcon />
+                    Notifications
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarContent>
+          <SidebarFooter className="p-2">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton tooltip="Settings (User Dropdown)" onClick={() => document.getElementById('user-avatar-dropdown-trigger')?.click()}>
+                  <Settings />
+                  Settings
                 </SidebarMenuButton>
-              </Link>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarContent>
-        <SidebarFooter className="p-2">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              {/* Placeholder for actual settings page/modal */}
-              <SidebarMenuButton tooltip="Settings (User Dropdown)" onClick={() => document.getElementById('user-avatar-dropdown-trigger')?.click()}>
-                <Settings />
-                Settings
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Logout" onClick={logout}>
-                <LogOutIcon />
-                Logout
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarFooter>
-      </Sidebar>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton tooltip="Logout" onClick={logout}>
+                  <LogOutIcon />
+                  Logout
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
+        </Sidebar>
 
-      <SidebarInset className="flex flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 sm:h-16 sm:px-6">
-          <div className="md:hidden">
-            <SidebarTrigger />
-          </div>
-          <h1 className="text-lg sm:text-xl font-semibold text-foreground flex-1">My LinkedUp</h1>
-          <div className="flex items-center gap-1 sm:gap-2 ml-auto">
-            <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => {/* TODO: Open ThemeEditor or design modal */} }}>
-              <Palette size={16} className="mr-1 sm:mr-2"/> Design
-            </Button>
-             <Button variant="outline" size="icon" className="sm:hidden" onClick={() => {/* TODO: Open ThemeEditor or design modal */} }}>
-              <Palette size={16}/>
-              <span className="sr-only">Design</span>
-            </Button>
-            <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => {/* TODO: Share functionality */} }}>
-              <Share2 size={16} className="mr-1 sm:mr-2"/> Share
-            </Button>
-             <Button variant="outline" size="icon" className="sm:hidden" onClick={() => {/* TODO: Share functionality */} }}>
-              <Share2 size={16}/>
-               <span className="sr-only">Share</span>
-            </Button>
-            <ThemeToggle />
-             <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" id="user-avatar-dropdown-trigger" className="relative h-8 w-8 rounded-full p-0 sm:h-9 sm:w-9 md:h-10 md:w-10">
-                    <Settings size={18} className="sm:size-5"/>
-                    <span className="sr-only">Settings</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user?.email || "user@example.com"}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout} className="text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-900/50 focus:text-red-700 dark:focus:text-red-300">
-                    <LogOutIcon size={16} className="mr-2" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-          </div>
-        </header>
-
-        <main className="flex-1 overflow-y-auto p-0 bg-muted/30">
-          <div className="container py-3 sm:py-4 px-3 sm:px-6 lg:px-8">
-            <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
-              {/* Left Panel: Editor */}
-              <div className="w-full lg:flex-[3] xl:flex-[2] space-y-4 sm:space-y-6">
-                
-                {/* Live Bar */}
-                <Card className="shadow-sm">
-                  <CardContent className="p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-                    <p className="text-sm text-foreground">
-                      Your LinkedUp is live: <Link href={`https://${userProfileLink}`} target="_blank" className="font-medium text-primary hover:underline">{userProfileLink}</Link>
-                    </p>
-                    <Button variant="outline" size="sm" onClick={copyLinkToClipboard}>
-                      <Copy size={14} className="mr-2" /> Copy URL
+        <SidebarInset className="flex flex-col">
+          <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 sm:h-16 sm:px-6">
+            <div className="md:hidden">
+              <SidebarTrigger />
+            </div>
+            <h1 className="text-lg sm:text-xl font-semibold text-foreground flex-1">My LinkedUp</h1>
+            <div className="flex items-center gap-1 sm:gap-2 ml-auto">
+              <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => {}}>
+                <Palette size={16} className="mr-1 sm:mr-2"/> Design
+              </Button>
+               <Button variant="outline" size="icon" className="sm:hidden" onClick={() => {}}>
+                <Palette size={16}/>
+                <span className="sr-only">Design</span>
+              </Button>
+              <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => {}}>
+                <Share2 size={16} className="mr-1 sm:mr-2"/> Share
+              </Button>
+               <Button variant="outline" size="icon" className="sm:hidden" onClick={() => {}}>
+                <Share2 size={16}/>
+                 <span className="sr-only">Share</span>
+              </Button>
+              <ThemeToggle />
+               <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" id="user-avatar-dropdown-trigger" className="relative h-8 w-8 rounded-full p-0 sm:h-9 sm:w-9 md:h-10 md:w-10">
+                      <Settings size={18} className="sm:size-5"/>
+                      <span className="sr-only">Settings</span>
                     </Button>
-                  </CardContent>
-                </Card>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user?.email || "user@example.com"}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Profile</DropdownMenuItem>
+                    <DropdownMenuItem>Settings</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={logout} className="text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-900/50 focus:text-red-700 dark:focus:text-red-300">
+                      <LogOutIcon size={16} className="mr-2" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+          </header>
 
-                {/* Profile Section */}
-                <div className="flex flex-col items-center text-center p-4">
-                  <Avatar className="w-24 h-24 mb-3 border-2 border-border">
-                     <AvatarImage src={theme.profileImageUrl || `https://placehold.co/100x100.png?text=${theme.username?.charAt(0) || 'A'}`} alt={theme.username || "User"} data-ai-hint="user avatar" />
-                     <AvatarFallback>{theme.username?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
-                  </Avatar>
-                  <h2 className="text-xl font-semibold text-foreground">@{theme.username || user?.name || "username"}</h2>
-                  <Button variant="link" size="sm" className="text-primary mt-1" onClick={() => {/* TODO: Implement Add/Edit Bio Modal or inline editing */}}>
-                    <Edit size={14} className="mr-1" /> {theme.bio ? "Edit Bio" : "Add Bio"}
-                  </Button>
-                  {/* Placeholder for social icons row */}
-                </div>
-                
-                {/* Add Link Button */}
-                <Button 
-                  onClick={handleOpenAddLink} 
-                  size="lg" 
-                  className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-md"
-                >
-                  <PlusCircle size={20} className="mr-2" /> Add Link
-                </Button>
+          <main className="flex-1 overflow-y-auto p-0 bg-muted/30">
+            <div className="container py-3 sm:py-4 px-3 sm:px-6 lg:px-8">
+              <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
+                {/* Left Panel: Editor */}
+                <div className="w-full lg:flex-[3] xl:flex-[2] space-y-4 sm:space-y-6">
+                  
+                  {/* Live Bar */}
+                  <Card className="shadow-sm">
+                    <CardContent className="p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+                      <p className="text-sm text-foreground">
+                        Your LinkedUp is live: <Link href={userProfileLink} target="_blank" className="font-medium text-primary hover:underline">{userProfileLink.replace(/^https?:\/\//, '')}</Link>
+                      </p>
+                      <Button variant="outline" size="sm" onClick={copyLinkToClipboard}>
+                        <Copy size={14} className="mr-2" /> Copy URL
+                      </Button>
+                    </CardContent>
+                  </Card>
 
-                {/* Links List */}
-                <div className="space-y-2 sm:space-y-3">
-                  {links.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-4 text-sm sm:text-base">No links yet. Add your first link!</p>
-                  ) : (
-                    <DndContext
-                      sensors={sensors}
-                      collisionDetection={closestCenter}
-                      onDragEnd={handleDragEnd}
-                      modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
-                    >
-                      <SortableContext items={linkIds} strategy={verticalListSortingStrategy}>
-                        {links.map(link => (
-                          <EditableLinkItem
-                            key={link.id}
-                            link={link}
-                            onEdit={handleEditLink}
-                            onDelete={handleDeleteLink}
-                            onToggleActive={handleToggleActive}
-                          />
-                        ))}
-                      </SortableContext>
-                    </DndContext>
-                  )}
-                </div>
-                
-                {/* Theme Editor (Kept as a card below for now) */}
-                <ThemeEditor theme={theme} onThemeChange={handleThemeChange} />
-              </div>
-
-              {/* Right Panel: Preview (Desktop) */}
-              <div className="hidden lg:block lg:flex-[2] xl:flex-[1] sticky top-[calc(5rem+1rem)] self-start">
-                <Card className="shadow-lg">
-                  <CardContent className={activeDeviceView !== 'desktop' ? 'flex justify-center items-start p-2 sm:p-4 overflow-auto' : 'p-0'}>
-                     <ProfilePreview 
-                        links={links} 
-                        theme={theme} 
-                        activeDeviceView={activeDeviceView} 
-                        showDeviceSelector={true} 
-                        onDeviceChange={setActiveDeviceView} 
-                     />
-                  </CardContent>
-                </Card>
-                 <Button 
-                    onClick={() => setIsPreviewModalOpen(true)} 
-                    variant="outline" 
-                    size="sm"
-                    className="w-full mt-3 lg:hidden" // Show only on mobile/tablet if needed, or just remove if preview button is in header
+                  {/* Profile Section */}
+                  <div className="flex flex-col items-center text-center p-4">
+                    <Avatar className="w-24 h-24 mb-3 border-2 border-border">
+                       <AvatarImage src={theme.profileImageUrl || `https://placehold.co/100x100.png?text=${theme.username?.charAt(0) || 'A'}`} alt={theme.username || "User"} data-ai-hint="user avatar" />
+                       <AvatarFallback>{theme.username?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
+                    </Avatar>
+                    <h2 className="text-xl font-semibold text-foreground">@{theme.username || user?.name || "username"}</h2>
+                    <Button variant="link" size="sm" className="text-primary mt-1" onClick={() => {/* TODO: Implement Add/Edit Bio Modal or inline editing */}}>
+                      <Edit size={14} className="mr-1" /> {theme.bio ? "Edit Bio" : "Add Bio"}
+                    </Button>
+                  </div>
+                  
+                  {/* Add Link Button */}
+                  <Button 
+                    onClick={handleOpenAddLink} 
+                    size="lg" 
+                    className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-md"
                   >
-                     Preview on Mobile
+                    <PlusCircle size={20} className="mr-2" /> Add Link
                   </Button>
+
+                  {/* Links List */}
+                  <div className="space-y-2 sm:space-y-3">
+                    {links.length === 0 ? (
+                      <p className="text-muted-foreground text-center py-4 text-sm sm:text-base">No links yet. Add your first link!</p>
+                    ) : (
+                      <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                        modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+                      >
+                        <SortableContext items={linkIds} strategy={verticalListSortingStrategy}>
+                          {links.map(link => (
+                            <EditableLinkItem
+                              key={link.id}
+                              link={link}
+                              onEdit={handleEditLink}
+                              onDelete={handleDeleteLink}
+                              onToggleActive={handleToggleActive}
+                            />
+                          ))}
+                        </SortableContext>
+                      </DndContext>
+                    )}
+                  </div>
+                  
+                  <ThemeEditor theme={theme} onThemeChange={handleThemeChange} />
+                </div>
+
+                {/* Right Panel: Preview (Desktop) */}
+                <div className="hidden lg:block lg:flex-[2] xl:flex-[1] sticky top-[calc(5rem+1rem)] self-start"> {/* Adjusted sticky top for header */}
+                  <Card className="shadow-lg">
+                    <CardContent className={activeDeviceView !== 'desktop' ? 'flex justify-center items-start p-2 sm:p-4 overflow-auto' : 'p-0'}>
+                       <ProfilePreview 
+                          links={links} 
+                          theme={theme} 
+                          activeDeviceView={activeDeviceView} 
+                          showDeviceSelector={true} 
+                          onDeviceChange={setActiveDeviceView} 
+                       />
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </div>
-          </div>
-        </main>
-      </SidebarInset>
+          </main>
+        </SidebarInset>
 
-      {/* Link Form Dialog */}
-      <Dialog open={isLinkFormOpen} onOpenChange={setIsLinkFormOpen}>
-        <DialogContent className="w-[90vw] max-w-md sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-lg">
-          <DialogTitle className="sr-only">{editingLink ? 'Edit Link' : 'Add New Link'}</DialogTitle>
-          <LinkForm 
-            link={editingLink} 
-            onSave={handleSaveLink} 
-            onClose={() => { setIsLinkFormOpen(false); setEditingLink(null); }} 
-          />
-        </DialogContent>
-      </Dialog>
+        {/* Link Form Dialog */}
+        <Dialog open={isLinkFormOpen} onOpenChange={setIsLinkFormOpen}>
+          <DialogContent className="w-[90vw] max-w-md sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-lg">
+            <DialogTitle className="sr-only">{editingLink ? 'Edit Link' : 'Add New Link'}</DialogTitle>
+            <LinkForm 
+              link={editingLink} 
+              onSave={handleSaveLink} 
+              onClose={() => { setIsLinkFormOpen(false); setEditingLink(null); }} 
+            />
+          </DialogContent>
+        </Dialog>
 
-      {/* Preview Modal (Mobile/Tablet) - Triggered by header button */}
-      <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
-         <DialogContent className="p-0 w-auto h-auto bg-transparent border-none shadow-none data-[state=open]:zoom-in-90 sm:rounded-lg">
-           <DialogTitle className="sr-only">Profile Page Preview</DialogTitle>
-           <ProfilePreview links={links} theme={theme} activeDeviceView="mobile" showDeviceSelector={false} />
-         </DialogContent>
-      </Dialog>
-    </SidebarProvider>
+        {/* Preview Modal (Mobile/Tablet) - This is not needed as per new design where mobile has no dedicated preview button */}
+        {/* 
+        <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
+           <DialogContent className="p-0 w-auto h-auto bg-transparent border-none shadow-none data-[state=open]:zoom-in-90 sm:rounded-lg">
+             <DialogTitle className="sr-only">Profile Page Preview</DialogTitle>
+             <ProfilePreview links={links} theme={theme} activeDeviceView="mobile" showDeviceSelector={false} />
+           </DialogContent>
+        </Dialog>
+        */}
+      </SidebarProvider>
+    </>
   );
 }
 
