@@ -2,7 +2,7 @@
 // src/components/dashboard/notifications/notification-detail-modal.tsx
 "use client";
 
-import type React from 'react';
+import React from 'react'; // Added import for React
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -106,3 +106,4 @@ export const NotificationDetailModal: React.FC<NotificationDetailModalProps> = (
     </Dialog>
   );
 };
+
