@@ -62,31 +62,32 @@ export const {
   CalendarDays,
   LogOut,
   AreaChart,
-  Users,
+  Users, // Already exported, used in mock notifications
   Percent,
   Clock,
   TrendingUp,
   TrendingDown,
   ArrowUpRight,
   ArrowDownRight,
-  Info,
+  Info, // Already exported, used in mock notifications
   LayoutDashboard,
   Activity,
-  PieChartIcon, // Renamed from PieChart to avoid conflict
+  PieChartIcon, 
   BarChart3, 
   MapPin,
-  TargetIcon, // Renamed from Target to avoid conflict or use as is
+  TargetIcon, 
   ExternalLink,
-  FileText,
+  FileText, // Already exported, used in mock notifications
   Settings2, 
   Mail,
-  AlertCircle,
+  AlertCircle, // Already exported, used in mock notifications
   Filter,
   MoreHorizontal,
-  Radar,
-  Map: MapIcon, // For geolocation map icon
-  MousePointerClick, // Added for CTA interactions
+  Radar: RadarIcon, 
+  Map: MapIcon, 
+  MousePointerClick, 
 } = LucideIcons;
 
 // Export Image as ImageIcon separately
 export const { Image: ImageIcon } = LucideIcons;
+

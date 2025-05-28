@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Bell, CalendarDays, LogOut, ChevronDown } from '@/components/icons';
+import { Bell, CalendarDays, LogOut, ChevronDown, Info, AlertCircle, FileText } from '@/components/icons';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import {
   DropdownMenu,
@@ -28,7 +28,7 @@ interface AnalyticsTopbarProps {
   username: string;
   notificationCount?: number;
   selectedPeriod: string;
-  onPeriodChange: (period: string, dateRange?: DateRange) => void; // Modified to optionally accept dateRange
+  onPeriodChange: (period: string, dateRange?: DateRange) => void;
   onLogout: () => void;
   className?: string;
 }
@@ -41,9 +41,18 @@ const periodOptions = [
   { label: 'Customizado', value: 'custom' },
 ];
 
+// Mock notification data
+const mockNotifications = [
+  { id: '1', title: 'Novo relatório semanal pronto!', description: 'O relatório de performance da semana passada já está disponível.', time: '5m atrás', icon: <FileText size={16} className="text-blue-500" /> },
+  { id: '2', title: 'Alerta de Métrica', description: 'CTR caiu 15% nas últimas 24h.', time: '1h atrás', icon: <AlertCircle size={16} className="text-red-500" /> },
+  { id: '3', title: 'Manutenção Programada', description: 'Sistema estará em manutenção hoje às 23h.', time: '3h atrás', icon: <Info size={16} className="text-yellow-500" /> },
+  { id: '4', title: 'Novo Usuário Marco Atingido', description: 'Parabéns! Você atingiu 10.000 usuários únicos.', time: 'Ontem', icon: <Users size={16} className="text-green-500" /> },
+];
+
+
 export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
   username,
-  notificationCount = 0,
+  notificationCount = 0, // Default to 0 if not provided
   selectedPeriod,
   onPeriodChange,
   onLogout,
@@ -51,9 +60,9 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
 }) => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false);
+  const [currentNotifications, setCurrentNotifications] = useState(mockNotifications);
 
   useEffect(() => {
-    // Reset date range if period changes away from custom
     if (selectedPeriod !== 'custom' && dateRange) {
       setDateRange(undefined);
     }
@@ -61,33 +70,30 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
 
   const handlePeriodSelect = (value: string) => {
     if (value === 'custom') {
-      onPeriodChange(value); // Inform parent that mode is custom
-      // Optionally, open the date picker popover immediately
-      // setIsDatePopoverOpen(true); 
+      onPeriodChange(value);
     } else {
       onPeriodChange(value);
-      setDateRange(undefined); // Clear date range for non-custom periods
+      setDateRange(undefined);
     }
   };
 
   const handleDateRangeApply = () => {
     setIsDatePopoverOpen(false);
     if (dateRange?.from && dateRange?.to) {
-      onPeriodChange('custom', dateRange); // Pass the selected range to the parent
+      onPeriodChange('custom', dateRange);
     } else if (dateRange?.from && !dateRange?.to) {
-      // If only 'from' is selected, treat it as a single day range for now, or adjust as needed
-      onPeriodChange('custom', {from: dateRange.from, to: dateRange.from });
+      onPeriodChange('custom', { from: dateRange.from, to: dateRange.from });
     }
   };
   
   const getPeriodLabel = () => {
-    if (selectedPeriod === 'custom') {
-      return periodOptions.find(p => p.value === 'custom')?.label || 'Customizado';
+    if (selectedPeriod === 'custom' && dateRange?.from && dateRange?.to) {
+      return `${format(dateRange.from, "dd/MM/yy")} - ${format(dateRange.to, "dd/MM/yy")}`;
     }
     return periodOptions.find(p => p.value === selectedPeriod)?.label || 'Selecionar Período';
   };
 
-  const getDateRangeLabel = () => {
+  const getDateRangeButtonLabel = () => {
     if (dateRange?.from) {
       if (dateRange.to) {
         return `${format(dateRange.from, "dd/MM/yy")} - ${format(dateRange.to, "dd/MM/yy")}`;
@@ -96,6 +102,8 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
     }
     return "Selecionar Datas";
   };
+
+  const displayedNotificationCount = currentNotifications.length > 0 ? currentNotifications.length : notificationCount;
 
 
   return (
@@ -133,7 +141,7 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
             <PopoverTrigger asChild>
               <Button variant="outline" className="flex items-center gap-1.5 text-xs sm:text-sm min-w-[150px] justify-between">
                 <CalendarDays size={14} className="text-muted-foreground sm:size-16" /> 
-                <span className="truncate">{getDateRangeLabel()}</span>
+                <span className="truncate">{getDateRangeButtonLabel()}</span>
                  <ChevronDown size={14} className="opacity-70 sm:size-16" />
               </Button>
             </PopoverTrigger>
@@ -149,22 +157,55 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
               />
               <div className="p-2 border-t flex justify-end gap-2">
                 <Button variant="ghost" size="sm" onClick={() => setIsDatePopoverOpen(false)}>Cancelar</Button>
-                <Button size="sm" onClick={handleDateRangeApply} disabled={!dateRange?.from || !dateRange?.to}>Aplicar</Button>
+                <Button size="sm" onClick={handleDateRangeApply} disabled={!dateRange?.from}>Aplicar</Button> {/* Allow applying with only one date or ensure both selected */}
               </div>
             </PopoverContent>
           </Popover>
         )}
 
-        <Button variant="ghost" size="icon" className="relative rounded-full h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10">
-          <Bell size={18} className="sm:size-20" />
-          {notificationCount > 0 && (
-            <span className="absolute top-1 right-1 flex h-2 w-2.5 sm:h-2.5 sm:w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-full w-full bg-primary"></span>
-            </span>
-          )}
-          <span className="sr-only">Notificações</span>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative rounded-full h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10">
+              <Bell size={18} className="sm:size-20" />
+              {displayedNotificationCount > 0 && (
+                <span className="absolute top-1 right-1 flex h-2 w-2.5 sm:h-2.5 sm:w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-full w-full bg-primary"></span>
+                </span>
+              )}
+              <span className="sr-only">Notificações</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-80 sm:w-96">
+            <DropdownMenuLabel className="flex justify-between items-center">
+              <span>Notificações</span>
+              {currentNotifications.length > 0 && (
+                <Button variant="link" size="sm" className="p-0 h-auto text-xs" onClick={() => setCurrentNotifications([])}>Limpar todas</Button>
+              )}
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {currentNotifications.length > 0 ? (
+              currentNotifications.map(notification => (
+                <DropdownMenuItem key={notification.id} className="flex items-start gap-2.5 py-2.5 px-3 cursor-pointer hover:bg-muted/50">
+                  {notification.icon && <div className="mt-0.5">{notification.icon}</div>}
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{notification.title}</p>
+                    <p className="text-xs text-muted-foreground">{notification.description}</p>
+                    <p className="text-xs text-muted-foreground/70 mt-0.5">{notification.time}</p>
+                  </div>
+                </DropdownMenuItem>
+              ))
+            ) : (
+              <DropdownMenuItem disabled className="text-center text-muted-foreground py-3">
+                Nenhuma notificação nova.
+              </DropdownMenuItem>
+            )}
+             <DropdownMenuSeparator />
+             <DropdownMenuItem className="justify-center text-sm text-primary hover:underline">
+                Ver todas as notificações
+             </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -198,3 +239,4 @@ export const AnalyticsTopbar: React.FC<AnalyticsTopbarProps> = ({
     </header>
   );
 };
+
