@@ -1,31 +1,41 @@
+
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState, type ReactElement } from 'react';
 import { useRouter } from 'next/navigation';
-import type { ReactElement } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { LoadingScreen } from '@/components/loading-screen';
 
-export default function HomePage(): ReactElement {
-  const { isAuthenticated, isLoading } = useAuth();
+const HomePage = (): ReactElement => {
+  const { isAuthenticated, isLoading: authIsLoading } = useAuth();
   const router = useRouter();
+  // isRedirecting state might not be strictly necessary if redirects are fast,
+  // but it helps clarify the component's current phase.
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   useEffect(() => {
     // Ensure this only runs on the client after initial checks
-    if (!isLoading) {
+    if (!authIsLoading) {
+      setIsRedirecting(true); // Signal that redirection logic is active
       if (isAuthenticated) {
         router.replace('/dashboard');
       } else {
         router.replace('/login');
       }
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [authIsLoading, isAuthenticated, router]);
 
-  // Show loading screen while auth state is being determined or redirection is pending
-  if (isLoading) {
-    return <LoadingScreen message="Initializing..." />;
+  let loadingMessage = "Initializing...";
+  if (authIsLoading) {
+    loadingMessage = "Initializing...";
+  } else if (isRedirecting) {
+    // This message might only flash briefly if redirection is quick.
+    loadingMessage = "Redirecting...";
   }
+  
+  // The component always returns LoadingScreen.
+  // The useEffect handles the actual navigation.
+  return <LoadingScreen message={loadingMessage} />;
+};
 
-  // Fallback loading screen during the brief moment before redirection takes effect
-  return <LoadingScreen message="Redirecting..." />;
-}
+export default HomePage;
