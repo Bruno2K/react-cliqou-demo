@@ -36,46 +36,54 @@ export default function NotificationsPage() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Set isMounted to true once the component mounts on the client-side.
-    // This helps avoid hydration issues and ensures localStorage is accessed only on the client.
     setIsMounted(true);
 
-    let finalNotifications: FullNotificationItem[] = [...initialMockNotifications]; // Default to a copy of mock
+    let loadedNotifications: FullNotificationItem[] = [];
 
     try {
       const storedNotificationsJSON = localStorage.getItem('linkedup-notifications');
       if (storedNotificationsJSON) {
         const parsedArray = JSON.parse(storedNotificationsJSON);
-        
-        if (Array.isArray(parsedArray)) {
-          // Map over the parsed array to restore icons and ensure timestamps are Date objects
-          finalNotifications = parsedArray.map((storedNotif: any) => {
-            // Find the original mock notification to get the icon
+        if (Array.isArray(parsedArray) && parsedArray.length > 0) {
+          loadedNotifications = parsedArray.map((storedNotif: any) => {
             const originalMock = initialMockNotifications.find(mock => mock.id === storedNotif.id);
-            const icon = originalMock ? originalMock.icon : <BellRing size={22} />; // Fallback icon
-
+            const icon = originalMock ? originalMock.icon : <BellRing size={22} />;
             return {
               ...storedNotif,
-              timestamp: new Date(storedNotif.timestamp), // Ensure timestamp is a Date object
-              icon: icon, // Restore icon
+              timestamp: new Date(storedNotif.timestamp),
+              icon: icon,
             };
           });
         }
+        // If storedNotificationsJSON was "[]" (empty array string), 
+        // or parsedArray was not an array, loadedNotifications remains [].
       }
     } catch (error) {
-      console.error("Error processing notifications from localStorage:", error);
-      // If error, finalNotifications remains a copy of initialMockNotifications
-      // To ensure a fresh start if parsing fails badly, you could also set it to a fresh copy:
-      finalNotifications = [...initialMockNotifications];
+      console.error("Error loading or processing notifications from localStorage:", error);
+      // loadedNotifications remains [] in case of error, will be handled by the check below.
     }
-    setNotifications(finalNotifications);
-  }, []); // Empty dependency array, runs once on mount client-side
+
+    // If, after attempting to load from localStorage, we have no notifications,
+    // then re-populate with the initial mock data.
+    if (loadedNotifications.length === 0) {
+      loadedNotifications = initialMockNotifications.map(mock => ({
+        ...mock,
+        timestamp: new Date(mock.timestamp), // Ensure timestamps are Date objects
+      }));
+    }
+    
+    setNotifications(loadedNotifications);
+  }, []);
 
   useEffect(() => {
     if (isMounted) {
-      // When saving, JSX for icons won't be stringified well.
-      // The loading effect above handles re-assigning icons from initialMockNotifications.
-      localStorage.setItem('linkedup-notifications', JSON.stringify(notifications));
+      // When saving, strip out JSX for icons as they don't stringify well.
+      // They will be re-assigned on load based on initialMockNotifications.
+      const notificationsToSave = notifications.map(notif => {
+        const { icon, ...rest } = notif; // Destructure to remove icon
+        return rest;
+      });
+      localStorage.setItem('linkedup-notifications', JSON.stringify(notificationsToSave));
     }
   }, [notifications, isMounted]);
 
@@ -198,7 +206,7 @@ export default function NotificationsPage() {
                           </TableCell>
                           <TableCell className="text-center hidden sm:table-cell">
                             <div className="flex justify-center items-center h-full">
-                              {notif.icon && React.isValidElement(notif.icon) ? React.cloneElement(notif.icon, { size: 22 }) : <BellRing size={22}/>}
+                              {notif.icon && React.isValidElement(notif.icon) ? React.cloneElement(notif.icon as React.ReactElement<any>, { size: 22 }) : <BellRing size={22}/>}
                             </div>
                           </TableCell>
                           <TableCell>
