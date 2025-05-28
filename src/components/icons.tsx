@@ -86,14 +86,15 @@ export const {
   EyeOff,
   CheckCircle,
   XCircle,
-  Filter: FilterIcon,
+  FilterIcon,
   MoreHorizontal,
-  Radar: RadarIcon, 
+  RadarIcon, 
   MapIcon, 
   MousePointerClick,
   Award,
   MessageSquare,
   ShoppingCart,
+  Search, // Added Search icon
 } = LucideIcons;
 
 // Export Image as ImageIcon separately

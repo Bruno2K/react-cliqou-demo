@@ -5,12 +5,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowLeft, BellRing, FileText, AlertCircle, Info, Users, Settings, CheckCircle, XCircle, Eye, EyeOff, Trash2, Mail, MailOpen, FilterIcon, MoreHorizontal, Award, MessageSquare, ShoppingCart, TrendingUp } from '@/components/icons';
+import { ArrowLeft, BellRing, FileText, AlertCircle, Info, Users, Settings, CheckCircle, XCircle, Eye, EyeOff, Trash2, Mail, MailOpen, FilterIcon, MoreHorizontal, Award, MessageSquare, ShoppingCart, TrendingUp, Search } from '@/components/icons';
 import type { FullNotificationItem } from '@/types';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -27,68 +28,70 @@ const initialMockNotifications: FullNotificationItem[] = [
   { id: 'notif8', icon: <ShoppingCart size={20} className="text-orange-500" />, title: 'Seu Pedido Foi Enviado', description: 'O pedido #S9876 referente ao plano premium foi processado e enviado.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6), isRead: true, category: 'billing' },
   { id: 'notif9', icon: <TrendingUp size={20} className="text-lime-500" />, title: 'Dica de Performance', description: 'Notamos que o link "Meu Ebook Gratuito" tem alta visualização mas baixa conversão. Considere revisar o CTA.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), isRead: true, category: 'tips' },
   { id: 'notif10', icon: <FileText size={20} className="text-blue-500" />, title: 'Relatório Mensal (Maio) Disponível', description: 'O relatório consolidado do mês de Maio está pronto.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), isRead: true, category: 'reports' },
+  { id: 'notif11', icon: <AlertCircle size={20} className="text-orange-500" />, title: 'Alerta de Segurança', description: 'Uma tentativa de login suspeita foi detectada em sua conta.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), isRead: false, category: 'alerts' },
+  { id: 'notif12', icon: <Info size={20} className="text-indigo-500" />, title: 'Nova Funcionalidade: Temas Avançados', description: 'Explore os novos temas avançados para personalizar sua página.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 20), isRead: true, category: 'updates' },
+  { id: 'notif13', icon: <Users size={20} className="text-teal-500" />, title: 'Convite para Colaboração', description: 'Usuário "parceiro@example.com" convidou você para colaborar em um projeto.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8), isRead: false, category: 'collaboration' },
+  { id: 'notif14', icon: <FileText size={20} className="text-blue-500" />, title: 'Relatório de Engajamento (Q2)', description: 'O relatório trimestral de engajamento dos usuários está disponível.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), isRead: true, category: 'reports' },
+  { id: 'notif15', icon: <Award size={20} className="text-amber-500" />, title: 'Conquista: Link Popular', description: 'Seu link "Guia Completo de Viagem" atingiu 1000 cliques!', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 50), isRead: false, category: 'achievements' },
 ];
 
+const ITEMS_PER_PAGE = 10;
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<FullNotificationItem[]>([]);
   const [filter, setFilter] = useState<'all' | 'read' | 'unread'>('all');
   const [isMounted, setIsMounted] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    setIsMounted(true); // Set mounted on client
+    setIsMounted(true); 
 
     let loadedNotifications: FullNotificationItem[] = [];
     try {
       const storedNotificationsJSON = localStorage.getItem('linkedup-notifications');
       if (storedNotificationsJSON) {
         const parsedArray = JSON.parse(storedNotificationsJSON);
-        // Ensure it's an array and has items before proceeding
         if (Array.isArray(parsedArray) && parsedArray.length > 0) {
            loadedNotifications = parsedArray.map((storedNotif: any) => {
-            // Find the original mock notification to get the icon JSX
             const originalMock = initialMockNotifications.find(mock => mock.id === storedNotif.id);
-            const icon = originalMock ? originalMock.icon : <BellRing size={22} />; // Fallback icon
-
+            const icon = originalMock ? originalMock.icon : <BellRing size={22} />; 
             return {
               ...storedNotif,
-              timestamp: new Date(storedNotif.timestamp), // Ensure timestamp is a Date object
-              icon: icon, // Assign the JSX icon
+              timestamp: new Date(storedNotif.timestamp), 
+              icon: icon, 
             };
           });
         }
       }
     } catch (error) {
       console.error("Error loading notifications from localStorage:", error);
-      // Fallback to initial mocks if loading fails or no data
-      loadedNotifications = []; // Ensure it's empty to trigger fallback if needed
+      loadedNotifications = [];
     }
     
-    // If, after attempting to load from localStorage, we have no notifications,
-    // then re-populate with the initial mock data.
     if (loadedNotifications.length === 0) {
       loadedNotifications = initialMockNotifications.map(mock => ({
         ...mock,
-        timestamp: new Date(mock.timestamp), // Ensure timestamps are Date objects
+        timestamp: new Date(mock.timestamp), 
       }));
     }
-    
     setNotifications(loadedNotifications);
-
   }, []);
 
 
   useEffect(() => {
     if (isMounted) {
-      // When saving, strip out JSX for icons as they don't stringify well.
-      // They will be re-assigned on load based on initialMockNotifications.
       const notificationsToSave = notifications.map(notif => {
-        const { icon, ...rest } = notif; // Destructure to remove icon
+        const { icon, ...rest } = notif; 
         return rest;
       });
       localStorage.setItem('linkedup-notifications', JSON.stringify(notificationsToSave));
     }
   }, [notifications, isMounted]);
+
+  useEffect(() => {
+    setCurrentPage(1); // Reset to first page when filter or search term changes
+  }, [filter, searchTerm]);
 
   const toggleReadStatus = (id: string) => {
     setNotifications(prev =>
@@ -114,12 +117,33 @@ export default function NotificationsPage() {
     setNotifications(prev => prev.filter(notif => !notif.isRead));
   };
 
+  const filteredAndSearchedNotifications = useMemo(() => {
+    let currentNotifications = notifications;
 
-  const filteredNotifications = useMemo(() => {
-    if (filter === 'read') return notifications.filter(n => n.isRead);
-    if (filter === 'unread') return notifications.filter(n => !n.isRead);
-    return notifications;
-  }, [notifications, filter]);
+    if (filter === 'read') {
+      currentNotifications = currentNotifications.filter(n => n.isRead);
+    } else if (filter === 'unread') {
+      currentNotifications = currentNotifications.filter(n => !n.isRead);
+    }
+
+    if (searchTerm.trim() !== '') {
+      const lowerSearchTerm = searchTerm.toLowerCase();
+      currentNotifications = currentNotifications.filter(n =>
+        n.title.toLowerCase().includes(lowerSearchTerm) ||
+        n.description.toLowerCase().includes(lowerSearchTerm)
+      );
+    }
+    return currentNotifications;
+  }, [notifications, filter, searchTerm]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredAndSearchedNotifications.length / ITEMS_PER_PAGE));
+
+  const paginatedNotifications = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredAndSearchedNotifications.slice(startIndex, endIndex);
+  }, [filteredAndSearchedNotifications, currentPage]);
+
 
   if (!isMounted) {
     return (
@@ -183,6 +207,16 @@ export default function NotificationsPage() {
                   </DropdownMenu>
                 </div>
               </div>
+              <div className="mt-4 relative">
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                    type="text"
+                    placeholder="Buscar por título ou descrição..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 w-full sm:w-auto"
+                />
+              </div>
             </CardHeader>
             <CardContent className="p-0 flex-1 min-h-0">
               <div className="overflow-auto h-full">
@@ -197,8 +231,8 @@ export default function NotificationsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredNotifications.length > 0 ? (
-                      filteredNotifications.map(notif => (
+                    {paginatedNotifications.length > 0 ? (
+                      paginatedNotifications.map(notif => (
                         <TableRow key={notif.id} className={cn(!notif.isRead && "bg-primary/5 dark:bg-primary/10")}>
                           <TableCell className="text-center">
                             {notif.isRead ? (
@@ -266,7 +300,7 @@ export default function NotificationsPage() {
                     ) : (
                       <TableRow>
                         <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                          {filter === 'all' && notifications.length === 0 ? 'Você não tem nenhuma notificação.' : `Nenhuma notificação ${filter === 'read' ? 'lida' : filter === 'unread' ? 'não lida' : ''} no momento.`}
+                          {searchTerm.trim() !== '' && filteredAndSearchedNotifications.length === 0 ? 'Nenhuma notificação encontrada para sua busca.' : notifications.length === 0 ? 'Você não tem nenhuma notificação.' : `Nenhuma notificação ${filter === 'read' ? 'lida' : filter === 'unread' ? 'não lida' : ''} no momento.`}
                         </TableCell>
                       </TableRow>
                     )}
@@ -274,6 +308,31 @@ export default function NotificationsPage() {
                 </Table>
               </div>
             </CardContent>
+            {totalPages > 0 && (
+                <CardFooter className="flex items-center justify-between border-t pt-4">
+                    <div className="text-sm text-muted-foreground">
+                        Página {currentPage} de {totalPages}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                            disabled={currentPage === 1}
+                        >
+                            Anterior
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                            disabled={currentPage === totalPages}
+                        >
+                            Próxima
+                        </Button>
+                    </div>
+                </CardFooter>
+            )}
           </Card>
         </div>
       </main>
