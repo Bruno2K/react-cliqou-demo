@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import type { DateRange } from "react-day-picker"; // Import DateRange
 import {
   SidebarProvider,
   Sidebar,
@@ -74,8 +75,8 @@ interface LinkPerformanceItem {
   name: string;
   url: string;
   totalClicks: number;
-  clicksByDevice: string; // e.g., "M:150 D:300 T:50"
-  clicksByRegion: string; // e.g., "BR:60% US:20% Outros:20%"
+  clicksByDevice: string; 
+  clicksByRegion: string; 
   status: 'active' | 'inactive';
 }
 
@@ -130,8 +131,6 @@ const externalLinkClicksData = [
   { id: 'ext4', name: 'Canal YouTube', clicks: 650 },
 ];
 
-
-// Helper for device size in PieChart
 const getActiveDeviceViewHelper = () => {
     if (typeof window !== 'undefined') {
         return window.innerWidth < 768 ? 'mobile' : 'desktop';
@@ -144,11 +143,25 @@ type ActiveView = 'overview' | 'engagement' | 'link-performance' | 'devices' | '
 
 export default function AnalyticsDashboardPage() {
   const [selectedPeriod, setSelectedPeriod] = useState('month');
+  const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>(undefined);
   const [activeView, setActiveView] = useState<ActiveView>('overview');
   const [activePieChartSizeView, setActivePieChartSizeView] = useState<'mobile' | 'desktop'>('desktop');
 
   const [statusFilter, setStatusFilter] = useState<Record<LinkPerformanceItem['status'], boolean>>({ active: true, inactive: true });
   const [performanceFilter, setPerformanceFilter] = useState<string>('all');
+
+  const handlePeriodChange = (period: string, dateRange?: DateRange) => {
+    setSelectedPeriod(period);
+    if (period === 'custom' && dateRange) {
+      setCustomDateRange(dateRange);
+      console.log("Custom date range selected:", dateRange);
+      // Here you would typically re-fetch data based on the new period/dateRange
+    } else if (period !== 'custom') {
+      setCustomDateRange(undefined);
+      console.log("Selected period:", period);
+      // Re-fetch data for standard period
+    }
+  };
 
   const handleStatusFilterChange = (status: LinkPerformanceItem['status']) => {
     setStatusFilter(prev => ({ ...prev, [status]: !prev[status] }));
@@ -156,6 +169,7 @@ export default function AnalyticsDashboardPage() {
 
   const filteredLinkPerformanceData = linkPerformanceData.filter(link => {
     const isStatusMatch = (statusFilter.active && link.status === 'active') || (statusFilter.inactive && link.status === 'inactive');
+    // Add performance filter logic here when implemented
     return isStatusMatch;
   });
 
@@ -164,7 +178,7 @@ export default function AnalyticsDashboardPage() {
     const handleResize = () => {
       setActivePieChartSizeView(getActiveDeviceViewHelper());
     };
-    handleResize();
+    handleResize(); // Set initial value
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -252,7 +266,7 @@ export default function AnalyticsDashboardPage() {
           username="Usuário Exemplo"
           notificationCount={3}
           selectedPeriod={selectedPeriod}
-          onPeriodChange={setSelectedPeriod}
+          onPeriodChange={handlePeriodChange}
           onLogout={() => console.log('Logout clicked')}
         />
 
