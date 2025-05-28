@@ -11,28 +11,30 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowLeft, BellRing, FileText, AlertCircle, Info, Users, Settings, CheckCircle, XCircle, Eye, EyeOff, Trash2, Mail, MailOpen, FilterIcon, MoreHorizontal, Award, MessageSquare, ShoppingCart, TrendingUp, Search } from '@/components/icons';
+import { ArrowLeft, BellRing, FileText, AlertCircle, Info, Users, Settings, CheckCircle, XCircle, Eye, EyeOff, Trash2, Mail, MailOpen, FilterIcon, MoreHorizontal, Award, MessageSquare, ShoppingCart, TrendingUp, Search, ExternalLink } from '@/components/icons';
 import type { FullNotificationItem } from '@/types';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { NotificationDetailModal } from '@/components/dashboard/notifications/notification-detail-modal';
+
 
 const initialMockNotifications: FullNotificationItem[] = [
-  { id: 'notif1', icon: <FileText size={20} className="text-blue-500" />, title: 'Relatório Semanal Gerado', description: 'Seu relatório de performance da semana passada já está disponível para visualização.', timestamp: new Date(Date.now() - 1000 * 60 * 5), isRead: false, category: 'reports', link: '/dashboard/analytics?section=reports' },
-  { id: 'notif2', icon: <AlertCircle size={20} className="text-red-500" />, title: 'Alerta: CTR Baixo', description: 'A taxa de cliques (CTR) da campanha "Promoção de Verão" caiu 15% nas últimas 24 horas.', timestamp: new Date(Date.now() - 1000 * 60 * 60), isRead: false, category: 'alerts' },
-  { id: 'notif3', icon: <Info size={20} className="text-yellow-500" />, title: 'Manutenção Programada', description: 'Haverá uma manutenção programada no sistema hoje, das 23:00 às 00:00.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3), isRead: true, category: 'system' },
-  { id: 'notif4', icon: <Users size={20} className="text-green-500" />, title: 'Marco Atingido: 10.000 Usuários!', description: 'Parabéns! Sua plataforma atingiu a marca de 10.000 usuários únicos cadastrados.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), isRead: true, category: 'milestones' },
-  { id: 'notif5', icon: <Settings size={20} className="text-gray-500" />, title: 'Atualização de Política de Privacidade', description: 'Nossa política de privacidade foi atualizada. Revise os novos termos.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48), isRead: false, category: 'updates' },
-  { id: 'notif6', icon: <Award size={20} className="text-purple-500" />, title: 'Você ganhou um novo Badge!', description: 'Por sua atividade recente, você desbloqueou o badge "Mestre dos Links".', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 72), isRead: false, category: 'achievements' },
-  { id: 'notif7', icon: <MessageSquare size={20} className="text-cyan-500" />, title: 'Nova Mensagem de Suporte', description: 'A equipe de suporte respondeu à sua solicitação #12345.', timestamp: new Date(Date.now() - 1000 * 60 * 30), isRead: false, category: 'support' },
-  { id: 'notif8', icon: <ShoppingCart size={20} className="text-orange-500" />, title: 'Seu Pedido Foi Enviado', description: 'O pedido #S9876 referente ao plano premium foi processado e enviado.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6), isRead: true, category: 'billing' },
-  { id: 'notif9', icon: <TrendingUp size={20} className="text-lime-500" />, title: 'Dica de Performance', description: 'Notamos que o link "Meu Ebook Gratuito" tem alta visualização mas baixa conversão. Considere revisar o CTA.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), isRead: true, category: 'tips' },
-  { id: 'notif10', icon: <FileText size={20} className="text-blue-500" />, title: 'Relatório Mensal (Maio) Disponível', description: 'O relatório consolidado do mês de Maio está pronto.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), isRead: true, category: 'reports' },
-  { id: 'notif11', icon: <AlertCircle size={20} className="text-orange-500" />, title: 'Alerta de Segurança', description: 'Uma tentativa de login suspeita foi detectada em sua conta.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), isRead: false, category: 'alerts' },
-  { id: 'notif12', icon: <Info size={20} className="text-indigo-500" />, title: 'Nova Funcionalidade: Temas Avançados', description: 'Explore os novos temas avançados para personalizar sua página.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 20), isRead: true, category: 'updates' },
-  { id: 'notif13', icon: <Users size={20} className="text-teal-500" />, title: 'Convite para Colaboração', description: 'Usuário "parceiro@example.com" convidou você para colaborar em um projeto.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8), isRead: false, category: 'collaboration' },
-  { id: 'notif14', icon: <FileText size={20} className="text-blue-500" />, title: 'Relatório de Engajamento (Q2)', description: 'O relatório trimestral de engajamento dos usuários está disponível.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), isRead: true, category: 'reports' },
-  { id: 'notif15', icon: <Award size={20} className="text-amber-500" />, title: 'Conquista: Link Popular', description: 'Seu link "Guia Completo de Viagem" atingiu 1000 cliques!', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 50), isRead: false, category: 'achievements' },
+  { id: 'notif1', icon: <FileText size={20} className="text-blue-500" />, title: 'Relatório Semanal Gerado', description: 'Seu relatório de performance da semana passada já está disponível para visualização.\n\nDetalhes importantes:\n- Aumento de 10% no tráfego.\n- Queda de 5% na taxa de rejeição.', timestamp: new Date(Date.now() - 1000 * 60 * 5), isRead: false, category: 'reports', link: '/dashboard/analytics?section=reports' },
+  { id: 'notif2', icon: <AlertCircle size={20} className="text-red-500" />, title: 'Alerta: CTR Baixo', description: 'A taxa de cliques (CTR) da campanha "Promoção de Verão" caiu 15% nas últimas 24 horas.\n\nSugestão: Revise o criativo ou a segmentação.', timestamp: new Date(Date.now() - 1000 * 60 * 60), isRead: false, category: 'alerts' },
+  { id: 'notif3', icon: <Info size={20} className="text-yellow-500" />, title: 'Manutenção Programada', description: 'Haverá uma manutenção programada no sistema hoje, das 23:00 às 00:00. Durante este período, o acesso ao dashboard pode ficar intermitente.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3), isRead: true, category: 'system' },
+  { id: 'notif4', icon: <Users size={20} className="text-green-500" />, title: 'Marco Atingido: 10.000 Usuários!', description: 'Parabéns! Sua plataforma atingiu a marca de 10.000 usuários únicos cadastrados. Continue o bom trabalho!', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), isRead: true, category: 'milestones' },
+  { id: 'notif5', icon: <Settings size={20} className="text-gray-500" />, title: 'Atualização de Política de Privacidade', description: 'Nossa política de privacidade foi atualizada. Revise os novos termos para continuar utilizando nossos serviços.\nLink para a política: [política de privacidade]', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48), isRead: false, category: 'updates', link: '/privacy-policy' },
+  { id: 'notif6', icon: <Award size={20} className="text-purple-500" />, title: 'Você ganhou um novo Badge!', description: 'Por sua atividade recente e engajamento, você desbloqueou o badge "Mestre dos Links". Confira seus badges no perfil.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 72), isRead: false, category: 'achievements' },
+  { id: 'notif7', icon: <MessageSquare size={20} className="text-cyan-500" />, title: 'Nova Mensagem de Suporte', description: 'A equipe de suporte respondeu à sua solicitação #12345 referente a problemas com a customização de temas.', timestamp: new Date(Date.now() - 1000 * 60 * 30), isRead: false, category: 'support', link: '/support/tickets/12345' },
+  { id: 'notif8', icon: <ShoppingCart size={20} className="text-orange-500" />, title: 'Seu Pedido Foi Enviado', description: 'O pedido #S9876 referente ao plano premium foi processado e a fatura enviada para seu e-mail.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6), isRead: true, category: 'billing' },
+  { id: 'notif9', icon: <TrendingUp size={20} className="text-lime-500" />, title: 'Dica de Performance', description: 'Notamos que o link "Meu Ebook Gratuito" tem alta visualização mas baixa conversão. Considere revisar o CTA ou a página de destino para otimizar.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3), isRead: true, category: 'tips' },
+  { id: 'notif10', icon: <FileText size={20} className="text-blue-500" />, title: 'Relatório Mensal (Maio) Disponível', description: 'O relatório consolidado do mês de Maio está pronto. Acesse para insights detalhados sobre sua performance.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5), isRead: true, category: 'reports', link: '/dashboard/analytics?period=may' },
+  { id: 'notif11', icon: <AlertCircle size={20} className="text-orange-500" />, title: 'Alerta de Segurança', description: 'Uma tentativa de login suspeita foi detectada em sua conta a partir de um novo dispositivo. Se não foi você, por favor, altere sua senha imediatamente.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), isRead: false, category: 'alerts' },
+  { id: 'notif12', icon: <Info size={20} className="text-indigo-500" />, title: 'Nova Funcionalidade: Temas Avançados', description: 'Explore os novos temas avançados para personalizar ainda mais sua página de links. Disponível agora nas configurações de aparência.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 20), isRead: true, category: 'updates' },
+  { id: 'notif13', icon: <Users size={20} className="text-teal-500" />, title: 'Convite para Colaboração', description: 'Usuário "parceiro@example.com" convidou você para colaborar em um projeto "Campanha de Marketing Q3". Aceite ou recuse no painel de colaborações.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8), isRead: false, category: 'collaboration' },
+  { id: 'notif14', icon: <FileText size={20} className="text-blue-500" />, title: 'Relatório de Engajamento (Q2)', description: 'O relatório trimestral de engajamento dos usuários do segundo trimestre está disponível. Verifique as tendências e principais insights.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7), isRead: true, category: 'reports' },
+  { id: 'notif15', icon: <Award size={20} className="text-amber-500" />, title: 'Conquista: Link Popular', description: 'Parabéns! Seu link "Guia Completo de Viagem" atingiu 1000 cliques! Veja mais estatísticas na página de desempenho por link.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 50), isRead: false, category: 'achievements', link: '/dashboard/analytics?view=link-performance&id=linkXYZ' },
 ];
 
 const ITEMS_PER_PAGE = 10;
@@ -44,35 +46,40 @@ export default function NotificationsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    setIsMounted(true); 
+  const [selectedNotificationForModal, setSelectedNotificationForModal] = useState<FullNotificationItem | null>(null);
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
 
+  useEffect(() => {
+    setIsMounted(true);
     let loadedNotifications: FullNotificationItem[] = [];
     try {
       const storedNotificationsJSON = localStorage.getItem('linkedup-notifications');
       if (storedNotificationsJSON) {
         const parsedArray = JSON.parse(storedNotificationsJSON);
+        // Ensure it's an array and not empty before proceeding
         if (Array.isArray(parsedArray) && parsedArray.length > 0) {
-           loadedNotifications = parsedArray.map((storedNotif: any) => {
+          loadedNotifications = parsedArray.map((storedNotif: any) => {
+            // Find the original mock notification to restore the icon
             const originalMock = initialMockNotifications.find(mock => mock.id === storedNotif.id);
-            const icon = originalMock ? originalMock.icon : <BellRing size={22} />; 
+            const icon = originalMock ? originalMock.icon : <BellRing size={22} />; // Fallback icon
             return {
               ...storedNotif,
-              timestamp: new Date(storedNotif.timestamp), 
-              icon: icon, 
+              timestamp: new Date(storedNotif.timestamp), // Ensure timestamp is a Date object
+              icon: icon, // Restore JSX icon
             };
           });
         }
       }
     } catch (error) {
       console.error("Error loading notifications from localStorage:", error);
-      loadedNotifications = [];
+      loadedNotifications = []; // Fallback to empty if error
     }
     
+    // If no notifications were loaded (e.g., first visit, error, or localStorage cleared), use initial mocks
     if (loadedNotifications.length === 0) {
       loadedNotifications = initialMockNotifications.map(mock => ({
         ...mock,
-        timestamp: new Date(mock.timestamp), 
+        timestamp: new Date(mock.timestamp), // Ensure mock timestamps are also Date objects
       }));
     }
     setNotifications(loadedNotifications);
@@ -81,8 +88,9 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (isMounted) {
+      // Strip non-serializable parts (like JSX icons) before saving
       const notificationsToSave = notifications.map(notif => {
-        const { icon, ...rest } = notif; 
+        const { icon, ...rest } = notif; // Exclude 'icon'
         return rest;
       });
       localStorage.setItem('linkedup-notifications', JSON.stringify(notificationsToSave));
@@ -117,6 +125,11 @@ export default function NotificationsPage() {
     setNotifications(prev => prev.filter(notif => !notif.isRead));
   };
 
+  const handleRowClick = (notification: FullNotificationItem) => {
+    setSelectedNotificationForModal(notification);
+    setIsNotificationModalOpen(true);
+  };
+
   const filteredAndSearchedNotifications = useMemo(() => {
     let currentNotifications = notifications;
 
@@ -133,7 +146,7 @@ export default function NotificationsPage() {
         n.description.toLowerCase().includes(lowerSearchTerm)
       );
     }
-    return currentNotifications;
+    return currentNotifications.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }, [notifications, filter, searchTerm]);
 
   const totalPages = Math.max(1, Math.ceil(filteredAndSearchedNotifications.length / ITEMS_PER_PAGE));
@@ -233,8 +246,12 @@ export default function NotificationsPage() {
                   <TableBody>
                     {paginatedNotifications.length > 0 ? (
                       paginatedNotifications.map(notif => (
-                        <TableRow key={notif.id} className={cn(!notif.isRead && "bg-primary/5 dark:bg-primary/10")}>
-                          <TableCell className="text-center">
+                        <TableRow 
+                          key={notif.id} 
+                          className={cn(!notif.isRead && "bg-primary/5 dark:bg-primary/10", "cursor-pointer hover:bg-muted/50 dark:hover:bg-muted/20")}
+                          onClick={() => handleRowClick(notif)}
+                        >
+                          <TableCell className="text-center" onClick={(e) => e.stopPropagation()}> {/* Prevent row click when clicking cell with buttons */}
                             {notif.isRead ? (
                               <CheckCircle size={20} className="text-green-500 mx-auto" />
                             ) : (
@@ -248,7 +265,7 @@ export default function NotificationsPage() {
                           </TableCell>
                           <TableCell>
                             <p className={cn("font-semibold", !notif.isRead && "text-primary")}>{notif.title}</p>
-                            <p className="text-sm text-muted-foreground truncate max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">{notif.description}</p>
+                            <p className="text-sm text-muted-foreground truncate max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">{notif.description.split('\n')[0]}</p> {/* Show only first line */}
                             <p className="text-xs text-muted-foreground mt-1 md:hidden">
                                   {formatDistanceToNow(notif.timestamp, { addSuffix: true, locale: ptBR })}
                             </p>
@@ -267,7 +284,7 @@ export default function NotificationsPage() {
                               </Tooltip>
                             </TooltipProvider>
                           </TableCell>
-                          <TableCell className="text-right">
+                          <TableCell className="text-right" onClick={(e) => e.stopPropagation()}> {/* Prevent row click when clicking cell with buttons */}
                             <div className="flex gap-1 justify-end">
                               <TooltipProvider>
                                 <Tooltip>
@@ -308,10 +325,10 @@ export default function NotificationsPage() {
                 </Table>
               </div>
             </CardContent>
-            {totalPages > 0 && (
+            {totalPages > 1 && ( // Show pagination only if there's more than one page
                 <CardFooter className="flex items-center justify-between border-t pt-4">
                     <div className="text-sm text-muted-foreground">
-                        Página {currentPage} de {totalPages}
+                        Página {currentPage} de {totalPages} ({filteredAndSearchedNotifications.length} resultados)
                     </div>
                     <div className="flex items-center gap-2">
                         <Button
@@ -336,6 +353,14 @@ export default function NotificationsPage() {
           </Card>
         </div>
       </main>
+      <NotificationDetailModal
+        isOpen={isNotificationModalOpen}
+        onClose={() => setIsNotificationModalOpen(false)}
+        notification={selectedNotificationForModal}
+        onToggleRead={toggleReadStatus}
+        onDelete={deleteNotification}
+      />
     </div>
   );
 }
+

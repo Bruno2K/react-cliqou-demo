@@ -94,7 +94,8 @@ export const {
   Award,
   MessageSquare,
   ShoppingCart,
-  Search, // Added Search icon
+  Search,
+  X, // Added X icon
 } = LucideIcons;
 
 // Export Image as ImageIcon separately
@@ -103,3 +104,4 @@ export const { Image: ImageIcon } = LucideIcons;
     
 
     
+
