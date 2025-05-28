@@ -50,32 +50,31 @@ export default function NotificationsPage() {
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    setIsMounted(true); // Indicate client-side mount is complete
     let loadedNotifications: FullNotificationItem[] = [];
     try {
       const storedNotificationsJSON = localStorage.getItem('linkedup-notifications');
       if (storedNotificationsJSON) {
         const parsedArray = JSON.parse(storedNotificationsJSON);
-        // Ensure it's an array and not empty before proceeding
-        if (Array.isArray(parsedArray) && parsedArray.length > 0) {
+        if (Array.isArray(parsedArray)) {
           loadedNotifications = parsedArray.map((storedNotif: any) => {
-            // Find the original mock notification to restore the icon
             const originalMock = initialMockNotifications.find(mock => mock.id === storedNotif.id);
-            const icon = originalMock ? originalMock.icon : <BellRing size={22} />; // Fallback icon
+            const icon = originalMock ? originalMock.icon : <BellRing size={22} />;
             return {
               ...storedNotif,
-              timestamp: new Date(storedNotif.timestamp), // Ensure timestamp is a Date object
-              icon: icon, // Restore JSX icon
+              timestamp: new Date(storedNotif.timestamp),
+              icon: icon,
             };
           });
         }
       }
     } catch (error) {
       console.error("Error loading notifications from localStorage:", error);
-      loadedNotifications = []; // Fallback to empty if error
+      // Fallback to empty if error, will be handled below
+      loadedNotifications = [];
     }
     
-    // If no notifications were loaded (e.g., first visit, error, or localStorage cleared), use initial mocks
+    // If no notifications were loaded (e.g., first visit, error, or localStorage cleared/empty array), use initial mocks
     if (loadedNotifications.length === 0) {
       loadedNotifications = initialMockNotifications.map(mock => ({
         ...mock,
@@ -88,9 +87,8 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (isMounted) {
-      // Strip non-serializable parts (like JSX icons) before saving
       const notificationsToSave = notifications.map(notif => {
-        const { icon, ...rest } = notif; // Exclude 'icon'
+        const { icon, ...rest } = notif;
         return rest;
       });
       localStorage.setItem('linkedup-notifications', JSON.stringify(notificationsToSave));
@@ -98,7 +96,7 @@ export default function NotificationsPage() {
   }, [notifications, isMounted]);
 
   useEffect(() => {
-    setCurrentPage(1); // Reset to first page when filter or search term changes
+    setCurrentPage(1); 
   }, [filter, searchTerm]);
 
   const toggleReadStatus = (id: string) => {
@@ -251,7 +249,7 @@ export default function NotificationsPage() {
                           className={cn(!notif.isRead && "bg-primary/5 dark:bg-primary/10", "cursor-pointer hover:bg-muted/50 dark:hover:bg-muted/20")}
                           onClick={() => handleRowClick(notif)}
                         >
-                          <TableCell className="text-center" onClick={(e) => e.stopPropagation()}> {/* Prevent row click when clicking cell with buttons */}
+                          <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
                             {notif.isRead ? (
                               <CheckCircle size={20} className="text-green-500 mx-auto" />
                             ) : (
@@ -265,7 +263,7 @@ export default function NotificationsPage() {
                           </TableCell>
                           <TableCell>
                             <p className={cn("font-semibold", !notif.isRead && "text-primary")}>{notif.title}</p>
-                            <p className="text-sm text-muted-foreground truncate max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">{notif.description.split('\n')[0]}</p> {/* Show only first line */}
+                            <p className="text-sm text-muted-foreground truncate max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">{notif.description.split('\n')[0]}</p>
                             <p className="text-xs text-muted-foreground mt-1 md:hidden">
                                   {formatDistanceToNow(notif.timestamp, { addSuffix: true, locale: ptBR })}
                             </p>
@@ -284,7 +282,7 @@ export default function NotificationsPage() {
                               </Tooltip>
                             </TooltipProvider>
                           </TableCell>
-                          <TableCell className="text-right" onClick={(e) => e.stopPropagation()}> {/* Prevent row click when clicking cell with buttons */}
+                          <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                             <div className="flex gap-1 justify-end">
                               <TooltipProvider>
                                 <Tooltip>
@@ -325,7 +323,7 @@ export default function NotificationsPage() {
                 </Table>
               </div>
             </CardContent>
-            {totalPages > 1 && ( // Show pagination only if there's more than one page
+            {totalPages > 1 && (
                 <CardFooter className="flex items-center justify-between border-t pt-4">
                     <div className="text-sm text-muted-foreground">
                         Página {currentPage} de {totalPages} ({filteredAndSearchedNotifications.length} resultados)
@@ -363,4 +361,3 @@ export default function NotificationsPage() {
     </div>
   );
 }
-
