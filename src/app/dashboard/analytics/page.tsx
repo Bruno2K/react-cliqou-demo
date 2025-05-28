@@ -23,7 +23,7 @@ import {
   AreaChart, BarChart3, Users, Link as LinkIcon, Percent, Clock, TrendingUp, TrendingDown, 
   AlertCircle, FileText, Settings, LogOut, AppWindow, PieChartIcon, Activity, 
   MapPin, TargetIcon, ExternalLink, CalendarDays, Edit3, FilterIcon, MoreHorizontal, 
-  ChevronDown, RadarIcon, Smartphone, MapIcon, MousePointerClick, HelpCircle, Megaphone
+  ChevronDown, RadarIcon, Smartphone, MapIcon, MousePointerClick, HelpCircle, Megaphone, UserCircle as UserCircleIcon
 } from '@/components/icons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LineChart, BarChart, PieChart as RechartsPieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Pie, Cell, Line, Bar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar as RechartsRadar } from 'recharts';
@@ -49,7 +49,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { UserCircle } from '@/components/icons';
+import { LoadingScreen } from '@/components/loading-screen';
 
 
 // Mock Data
@@ -147,7 +147,7 @@ export default function AnalyticsDashboardPage() {
 
   const [statusFilter, setStatusFilter] = useState<Record<LinkPerformanceItem['status'], boolean>>({ active: true, inactive: true });
   const [performanceFilter, setPerformanceFilter] = useState<string>('all'); // Added for consistency, not fully implemented
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading: authIsLoading } = useAuth();
 
   const handlePeriodChange = (period: string, dateRange?: DateRange) => {
     setSelectedPeriod(period);
@@ -171,6 +171,9 @@ export default function AnalyticsDashboardPage() {
     return isStatusMatch; // && isPerformanceMatch;
   });
 
+  if (authIsLoading) {
+    return <LoadingScreen message="Loading Dashboard..." />;
+  }
 
   return (
     <SidebarProvider defaultOpen>
@@ -182,8 +185,8 @@ export default function AnalyticsDashboardPage() {
         <SidebarHeader className="p-2 flex items-center justify-between">
              <div className="flex items-center overflow-hidden">
                 <Avatar className="h-7 w-7 group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5 flex-shrink-0">
-                  <AvatarImage src={user?.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar" />
-                  <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
+                  <AvatarImage src={user?.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar"/>
+                  <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || <UserCircleIcon />}</AvatarFallback>
                 </Avatar>
                 <span className="text-sm font-semibold ml-1.5 group-data-[collapsible=icon]:hidden truncate" title={user?.name || "My Account"}>{user?.name || "My Account"}</span>
              </div>

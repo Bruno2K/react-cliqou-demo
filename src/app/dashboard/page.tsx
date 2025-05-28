@@ -41,6 +41,7 @@ import {
   SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/contexts/auth-context';
+import { LoadingScreen } from '@/components/loading-screen';
 
 
 import {
@@ -91,7 +92,7 @@ export default function EditorDashboardPage() {
   const [isProfilePicModalOpen, setIsProfilePicModalOpen] = useState(false);
 
   const { toast } = useToast();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading: authIsLoading } = useAuth();
 
   useEffect(() => {
     const savedLinks = localStorage.getItem('linkedup-links');
@@ -105,9 +106,11 @@ export default function EditorDashboardPage() {
     }
     if (user) {
       loadedTheme.username = savedTheme ? loadedTheme.username : user.name || initialTheme.username;
-      loadedTheme.profileImageUrl = savedTheme 
-                                      ? loadedTheme.profileImageUrl 
-                                      : (user.profileImageUrl || initialTheme.profileImageUrl);
+      // Prioritize saved theme image, then auth user image, then initial theme default
+      const themeProfileImage = loadedTheme.profileImageUrl && loadedTheme.profileImageUrl !== initialTheme.profileImageUrl 
+                                ? loadedTheme.profileImageUrl 
+                                : undefined;
+      loadedTheme.profileImageUrl = themeProfileImage || user.profileImageUrl || initialTheme.profileImageUrl;
     }
     setTheme(loadedTheme);
 
@@ -192,8 +195,8 @@ export default function EditorDashboardPage() {
     }
   };
 
-  if (!isMounted) {
-    return <div className="flex items-center justify-center min-h-screen bg-background"><p>Loading Cliqou Editor...</p></div>;
+  if (!isMounted || authIsLoading) {
+    return <LoadingScreen message="Loading Cliqou Editor..." />;
   }
 
   return (
@@ -203,7 +206,7 @@ export default function EditorDashboardPage() {
           <SidebarHeader className="p-2 flex items-center justify-between">
              <div className="flex items-center overflow-hidden">
                 <Avatar className="h-7 w-7 group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5 flex-shrink-0">
-                  <AvatarImage src={user?.profileImageUrl || theme.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar" />
+                  <AvatarImage src={user?.profileImageUrl || theme.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar"/>
                   <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
                 </Avatar>
                 <span className="text-sm font-semibold ml-1.5 group-data-[collapsible=icon]:hidden truncate" title={user?.name || "My Account"}>{user?.name || "My Account"}</span>
@@ -231,6 +234,7 @@ export default function EditorDashboardPage() {
             
             <SidebarSeparator className="my-3" />
             
+            {/* Tools section removed */}
           </SidebarContent>
           <SidebarFooter className="p-2 mt-auto">
             <SidebarMenu>
@@ -291,8 +295,10 @@ export default function EditorDashboardPage() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" id="user-avatar-dropdown-trigger" className="relative h-8 w-8 rounded-full p-0 sm:h-9 sm:w-9 md:h-10 md:w-10">
-                    <Settings size={18} className="sm:size-5" />
-                    <span className="sr-only">Settings</span>
+                     <Avatar className="h-full w-full">
+                        <AvatarImage src={user?.profileImageUrl || theme.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar"/>
+                        <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
+                    </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -305,7 +311,7 @@ export default function EditorDashboardPage() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIsProfilePicModalOpen(true)}>Update Profile Picture</DropdownMenuItem>
                   <DropdownMenuItem>Settings</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout} className="text-red-600 dark:text-red-400 focus:bg-red-50 dark:focus:bg-red-900/50 focus:text-red-700 dark:focus:text-red-300">
