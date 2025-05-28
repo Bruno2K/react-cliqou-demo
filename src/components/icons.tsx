@@ -26,6 +26,7 @@ export const IconRenderer: React.FC<{ name?: string; className?: string; size?: 
   let formattedName = name.charAt(0).toUpperCase() + name.slice(1);
   if (formattedName === "Github") formattedName = "GitHub"; 
   if (formattedName === "Linkedin") formattedName = "Linkedin"; 
+  if (formattedName === "Twitter") formattedName = "Twitter";
 
 
   if (formattedName in LucideIcons) {
@@ -66,7 +67,7 @@ export const {
   LogIn, 
   Loader2, 
   AreaChart,
-  Users, // Also for Audience
+  Users, 
   Percent,
   Clock,
   TrendingUp,
@@ -75,10 +76,10 @@ export const {
   ArrowDownRight,
   Info,
   AlertCircle,
-  LayoutDashboard, // For My Linktree (Editor) main icon in sidebar
+  LayoutDashboard: DashboardIcon, 
   Activity,
   PieChartIcon, 
-  BarChart3, // For Analytics
+  BarChart3, 
   MapPin,
   TargetIcon, 
   ExternalLink,
@@ -102,16 +103,18 @@ export const {
   MailCheck, 
   Copy,
   Edit, 
+  Edit2, // For profile pic edit icon
   Share2,
-  Store, // For My Shop
-  DollarSign, // For Earn
-  LayoutGrid, // Alternative for My Linktree if LayoutDashboard is used elsewhere
-  AppWindow, // Alternative for My Linktree
-  CalendarCheck, // For Social planner
-  MessageSquareReply, // For Instagram auto-reply
-  Link2, // For Link shortener
-  HelpCircle, // For Help
-  Megaphone // For Feedback/Announcements
+  Store, 
+  DollarSign, 
+  AppWindow, 
+  CalendarCheck, 
+  MessageSquareReply, 
+  Link2, 
+  HelpCircle, 
+  Megaphone,
+  UploadCloud, // For profile pic modal
+  Twitter, // Explicitly added if not covered by general logic
 } = LucideIcons;
 
 // Export Image as ImageIcon separately
@@ -119,4 +122,5 @@ export const { Image: ImageIcon } = LucideIcons;
 
 // Export Edit3 as EditorIcon for clarity if needed elsewhere, Edit3 is already exported
 export const { Edit3: EditorIcon } = LucideIcons;
+
 
