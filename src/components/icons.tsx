@@ -98,9 +98,15 @@ export const {
   ShoppingCart,
   Search,
   X,
-  KeyRound, // Added KeyRound
-  MailCheck, // Added MailCheck
+  KeyRound, 
+  MailCheck, 
+  Copy, // Added Copy
+  Edit, // Added Edit (distinct from Edit3)
+  Share2, // Added Share2 for Share functionality
 } = LucideIcons;
 
 // Export Image as ImageIcon separately
 export const { Image: ImageIcon } = LucideIcons;
+
+// Export Edit3 as EditorIcon for clarity if needed elsewhere, Edit3 is already exported
+export const { Edit3: EditorIcon } = LucideIcons;

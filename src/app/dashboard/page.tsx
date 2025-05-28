@@ -11,7 +11,7 @@ import { ProfilePreview } from '@/components/dashboard/profile-preview';
 import { EditableLinkItem } from '@/components/dashboard/editable-link-item';
 import { LinkForm } from '@/components/dashboard/link-form';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { PlusCircle, Link as LinkIconLucide, Eye as EyeIconImport, LayoutDashboard, BellRing as NotificationsIcon, Settings as SettingsIcon, LogOut as LogOutIcon, Edit3, PieChartIcon, UserCircle } from '@/components/icons';
+import { PlusCircle, Palette, Share2, Settings, Copy, Edit, UserCircle, Link as LinkIconLucide, PieChartIcon, BellRing as NotificationsIcon, LogOut as LogOutIcon, Edit3 as EditorIcon } from '@/components/icons';
 import { useToast } from "@/hooks/use-toast";
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -54,6 +54,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { restrictToVerticalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers';
+import { Input } from '@/components/ui/input';
 
 
 const initialTheme: ThemeSettings = {
@@ -83,7 +84,7 @@ export default function EditorDashboardPage() {
   
   const [isLinkFormOpen, setIsLinkFormOpen] = useState(false);
   const [editingLink, setEditingLink] = useState<LinkItem | null>(null);
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // For mobile preview
 
   const { toast } = useToast();
   const { user, logout } = useAuth();
@@ -93,10 +94,20 @@ export default function EditorDashboardPage() {
     const savedTheme = localStorage.getItem('linkedup-theme');
     if (savedLinks) setLinks(JSON.parse(savedLinks));
     else setLinks(initialLinks);
-    if (savedTheme) setTheme(JSON.parse(savedTheme));
-    else setTheme(initialTheme);
+    
+    let loadedTheme = initialTheme;
+    if (savedTheme) {
+      loadedTheme = { ...initialTheme, ...JSON.parse(savedTheme) };
+    }
+    // Update theme with user data if available and not already set by savedTheme
+    if (user) {
+      loadedTheme.username = savedTheme ? loadedTheme.username : user.name || initialTheme.username;
+      loadedTheme.profileImageUrl = savedTheme ? loadedTheme.profileImageUrl : user.profileImageUrl || initialTheme.profileImageUrl;
+    }
+    setTheme(loadedTheme);
+    
     setIsMounted(true);
-  }, []);
+  }, [user]); // Add user to dependency array to update theme when user loads
 
   useEffect(() => {
     if (isMounted) {
@@ -160,6 +171,13 @@ export default function EditorDashboardPage() {
   
   const linkIds = useMemo(() => links.map(link => link.id), [links]);
 
+  const userProfileLink = user ? `linkedup.example/${user.name?.toLowerCase().replace(/\s+/g, '-') || 'profile'}` : 'linkedup.example/profile';
+
+  const copyLinkToClipboard = () => {
+    navigator.clipboard.writeText(`https://${userProfileLink}`);
+    toast({ title: "URL Copied!", description: "Your LinkedUp URL has been copied to the clipboard." });
+  };
+
   if (!isMounted) {
     return <div className="flex items-center justify-center min-h-screen bg-background"><p>Loading LinkedUp Editor...</p></div>;
   }
@@ -168,14 +186,17 @@ export default function EditorDashboardPage() {
     <SidebarProvider defaultOpen>
       <Sidebar variant="sidebar" collapsible="icon" className="border-r">
         <SidebarHeader className="p-2">
-          <Edit3 size={24} className="text-primary group-data-[collapsible=icon]:size-5" />
-          <span className="text-lg font-semibold ml-1.5 group-data-[collapsible=icon]:hidden">LinkedUp</span>
+           <Avatar className="h-7 w-7 group-data-[collapsible=icon]:h-5 group-data-[collapsible=icon]:w-5">
+             <AvatarImage src={user?.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar" />
+             <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
+           </Avatar>
+          <span className="text-sm font-semibold ml-1.5 group-data-[collapsible=icon]:hidden">{user?.name || "My Account"}</span>
         </SidebarHeader>
         <SidebarContent className="p-2">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton isActive={true} tooltip="Editor">
-                <Edit3 />
+                <EditorIcon />
                 Editor
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -200,8 +221,9 @@ export default function EditorDashboardPage() {
         <SidebarFooter className="p-2">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip="Settings">
-                <SettingsIcon />
+              {/* Placeholder for actual settings page/modal */}
+              <SidebarMenuButton tooltip="Settings (User Dropdown)" onClick={() => document.getElementById('user-avatar-dropdown-trigger')?.click()}>
+                <Settings />
                 Settings
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -220,19 +242,28 @@ export default function EditorDashboardPage() {
           <div className="md:hidden">
             <SidebarTrigger />
           </div>
-          <h1 className="text-lg sm:text-xl font-semibold text-foreground flex-1">Link Editor</h1>
+          <h1 className="text-lg sm:text-xl font-semibold text-foreground flex-1">My LinkedUp</h1>
           <div className="flex items-center gap-1 sm:gap-2 ml-auto">
-            <Button onClick={() => setIsPreviewModalOpen(true)} className="lg:hidden" variant="outline" size="sm">
-              <EyeIconImport size={16} className="mr-1 sm:mr-2" /> Preview
+            <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => {/* TODO: Open ThemeEditor or design modal */} }}>
+              <Palette size={16} className="mr-1 sm:mr-2"/> Design
+            </Button>
+             <Button variant="outline" size="icon" className="sm:hidden" onClick={() => {/* TODO: Open ThemeEditor or design modal */} }}>
+              <Palette size={16}/>
+              <span className="sr-only">Design</span>
+            </Button>
+            <Button variant="outline" size="sm" className="hidden sm:flex" onClick={() => {/* TODO: Share functionality */} }}>
+              <Share2 size={16} className="mr-1 sm:mr-2"/> Share
+            </Button>
+             <Button variant="outline" size="icon" className="sm:hidden" onClick={() => {/* TODO: Share functionality */} }}>
+              <Share2 size={16}/>
+               <span className="sr-only">Share</span>
             </Button>
             <ThemeToggle />
              <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0 sm:h-9 sm:w-9 md:h-10 md:w-10">
-                    <Avatar className="h-full w-full">
-                      <AvatarImage src={user?.profileImageUrl || `https://placehold.co/80x80.png?text=${user?.name?.charAt(0) || 'U'}`} alt={user?.name || "User"} data-ai-hint="user avatar" />
-                      <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
-                    </Avatar>
+                  <Button variant="ghost" size="icon" id="user-avatar-dropdown-trigger" className="relative h-8 w-8 rounded-full p-0 sm:h-9 sm:w-9 md:h-10 md:w-10">
+                    <Settings size={18} className="sm:size-5"/>
+                    <span className="sr-only">Settings</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -257,51 +288,78 @@ export default function EditorDashboardPage() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-0 bg-muted/30"> {/* Removed dashboard padding here */}
-          <div className="container py-3 sm:py-4 px-3 sm:px-6 lg:px-8"> {/* Added original container back */}
+        <main className="flex-1 overflow-y-auto p-0 bg-muted/30">
+          <div className="container py-3 sm:py-4 px-3 sm:px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row gap-3 sm:gap-4">
               {/* Left Panel: Editor */}
-              <div className="w-full lg:w-2/5 space-y-3 sm:space-y-4">
-                <Card className="shadow-lg">
-                  <CardHeader className="flex flex-col items-start gap-2 p-3 sm:p-4 sm:flex-row sm:items-center sm:justify-between">
-                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                      <LinkIconLucide size={16} className="sm:w-[18px] sm:h-[18px]" /> 
-                      Manage Links
-                    </CardTitle>
-                    <Button onClick={handleOpenAddLink} size="sm" className="text-xs px-2 py-1 h-auto sm:text-sm sm:px-3 sm:py-1.5 sm:h-auto self-start sm:self-center">
-                      <PlusCircle size={14} className="mr-1 sm:mr-1.5" /> Add Link
+              <div className="w-full lg:flex-[3] xl:flex-[2] space-y-4 sm:space-y-6">
+                
+                {/* Live Bar */}
+                <Card className="shadow-sm">
+                  <CardContent className="p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+                    <p className="text-sm text-foreground">
+                      Your LinkedUp is live: <Link href={`https://${userProfileLink}`} target="_blank" className="font-medium text-primary hover:underline">{userProfileLink}</Link>
+                    </p>
+                    <Button variant="outline" size="sm" onClick={copyLinkToClipboard}>
+                      <Copy size={14} className="mr-2" /> Copy URL
                     </Button>
-                  </CardHeader>
-                  <CardContent className="p-2 sm:p-3">
-                    {links.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-4 text-sm sm:text-base">No links yet. Add your first link!</p>
-                    ) : (
-                      <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                        modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
-                      >
-                        <SortableContext items={linkIds} strategy={verticalListSortingStrategy}>
-                          {links.map(link => (
-                            <EditableLinkItem
-                              key={link.id}
-                              link={link}
-                              onEdit={handleEditLink}
-                              onDelete={handleDeleteLink}
-                              onToggleActive={handleToggleActive}
-                            />
-                          ))}
-                        </SortableContext>
-                      </DndContext>
-                    )}
                   </CardContent>
                 </Card>
+
+                {/* Profile Section */}
+                <div className="flex flex-col items-center text-center p-4">
+                  <Avatar className="w-24 h-24 mb-3 border-2 border-border">
+                     <AvatarImage src={theme.profileImageUrl || `https://placehold.co/100x100.png?text=${theme.username?.charAt(0) || 'A'}`} alt={theme.username || "User"} data-ai-hint="user avatar" />
+                     <AvatarFallback>{theme.username?.charAt(0).toUpperCase() || <UserCircle />}</AvatarFallback>
+                  </Avatar>
+                  <h2 className="text-xl font-semibold text-foreground">@{theme.username || user?.name || "username"}</h2>
+                  <Button variant="link" size="sm" className="text-primary mt-1" onClick={() => {/* TODO: Implement Add/Edit Bio Modal or inline editing */}}>
+                    <Edit size={14} className="mr-1" /> {theme.bio ? "Edit Bio" : "Add Bio"}
+                  </Button>
+                  {/* Placeholder for social icons row */}
+                </div>
+                
+                {/* Add Link Button */}
+                <Button 
+                  onClick={handleOpenAddLink} 
+                  size="lg" 
+                  className="w-full h-12 text-base bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-md"
+                >
+                  <PlusCircle size={20} className="mr-2" /> Add Link
+                </Button>
+
+                {/* Links List */}
+                <div className="space-y-2 sm:space-y-3">
+                  {links.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-4 text-sm sm:text-base">No links yet. Add your first link!</p>
+                  ) : (
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                      modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+                    >
+                      <SortableContext items={linkIds} strategy={verticalListSortingStrategy}>
+                        {links.map(link => (
+                          <EditableLinkItem
+                            key={link.id}
+                            link={link}
+                            onEdit={handleEditLink}
+                            onDelete={handleDeleteLink}
+                            onToggleActive={handleToggleActive}
+                          />
+                        ))}
+                      </SortableContext>
+                    </DndContext>
+                  )}
+                </div>
+                
+                {/* Theme Editor (Kept as a card below for now) */}
                 <ThemeEditor theme={theme} onThemeChange={handleThemeChange} />
               </div>
 
               {/* Right Panel: Preview (Desktop) */}
-              <div className="hidden lg:block w-full lg:w-3/5 sticky top-[calc(5rem+1rem)] self-start"> {/* Adjusted sticky top due to header height */}
+              <div className="hidden lg:block lg:flex-[2] xl:flex-[1] sticky top-[calc(5rem+1rem)] self-start">
                 <Card className="shadow-lg">
                   <CardContent className={activeDeviceView !== 'desktop' ? 'flex justify-center items-start p-2 sm:p-4 overflow-auto' : 'p-0'}>
                      <ProfilePreview 
@@ -313,6 +371,14 @@ export default function EditorDashboardPage() {
                      />
                   </CardContent>
                 </Card>
+                 <Button 
+                    onClick={() => setIsPreviewModalOpen(true)} 
+                    variant="outline" 
+                    size="sm"
+                    className="w-full mt-3 lg:hidden" // Show only on mobile/tablet if needed, or just remove if preview button is in header
+                  >
+                     Preview on Mobile
+                  </Button>
               </div>
             </div>
           </div>
@@ -331,7 +397,7 @@ export default function EditorDashboardPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Preview Modal (Mobile) */}
+      {/* Preview Modal (Mobile/Tablet) - Triggered by header button */}
       <Dialog open={isPreviewModalOpen} onOpenChange={setIsPreviewModalOpen}>
          <DialogContent className="p-0 w-auto h-auto bg-transparent border-none shadow-none data-[state=open]:zoom-in-90 sm:rounded-lg">
            <DialogTitle className="sr-only">Profile Page Preview</DialogTitle>
@@ -341,3 +407,4 @@ export default function EditorDashboardPage() {
     </SidebarProvider>
   );
 }
+
