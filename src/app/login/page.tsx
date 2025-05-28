@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link'; // Import Link
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -98,7 +99,7 @@ export default function LoginPage() {
             </div>
             {error && <p className="text-sm text-destructive pt-1">{error}</p>}
           </CardContent>
-          <CardFooter className="p-6 pt-2">
+          <CardFooter className="flex flex-col items-center gap-4 p-6 pt-2">
             <Button type="submit" className="w-full h-11 text-base" disabled={isLoggingIn}>
               {isLoggingIn ? (
                 <>
@@ -109,6 +110,11 @@ export default function LoginPage() {
                 'Sign In'
               )}
             </Button>
+            <Link href="/forgot-password" passHref>
+              <Button variant="link" className="text-sm text-muted-foreground hover:text-primary">
+                Forgot Password?
+              </Button>
+            </Link>
           </CardFooter>
         </form>
       </Card>
